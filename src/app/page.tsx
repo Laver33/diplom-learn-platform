@@ -1,12 +1,19 @@
-import Image from "next/image";
-import SignUP from "./auth/SingUP";
+// src/app/page.tsx
+"use client"
+
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 export default function Home() {
+  const router = useRouter()
+  
+  useEffect(() => {
+    router.push('/signup')
+  }, [router])
+  
   return (
-    <>
-    
-    <SignUP/>
-    
-    </>
-  );
+    <div className="flex justify-center items-center min-h-screen">
+      <p>Загрузка...</p>
+    </div>
+  )
 }
