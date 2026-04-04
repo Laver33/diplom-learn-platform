@@ -6,6 +6,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { useRedirectIfAuth } from "@/lib/auth-check"
 import { auth } from "@/lib/firebase/config"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import Link from "next/link"
@@ -14,6 +15,8 @@ import toast from "react-hot-toast"
 
 
 const SignIn = () => {
+    useRedirectIfAuth()
+    
     const [email, setEmail] = useState<string>("")  
     const [password, setPassword] = useState<string>("")
     const [error, setError] = useState(false);
