@@ -22,6 +22,9 @@ const SignUP = () => {
     const [passwordCopy, setPasswordCopy] = useState<string>("")  
     const [error, setError] = useState(false);
 
+    // const data = Date()
+    // const [regData, setRegData] = useState("")
+
     const registerCheck = (e: any) => {
         e.preventDefault();
 
@@ -34,6 +37,7 @@ const SignUP = () => {
             toast.error('Пароль должен быть минимум 6 символов')
             return
         }
+
 
         createUserWithEmailAndPassword(auth, email, password).then((user) => {
             toast.success('Успешно')

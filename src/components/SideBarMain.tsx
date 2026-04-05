@@ -4,6 +4,7 @@ import { useUserStore } from "@/app/store/userStore";
 import { 
   Sidebar, 
   SidebarContent, 
+  SidebarFooter, 
   SidebarHeader, 
   SidebarMenuButton,
   SidebarMenuItem,
@@ -12,41 +13,53 @@ import {
 } from "./ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import toast from "react-hot-toast";
-import Image, { StaticImageData } from "next/image";
+import Image  from "next/image";
 
 // Импорты иконок
 import educateIcon from '../../public/images/educateIcon.png'
 import cursesIcon from '../../public/images/cursesIcon.png'
+import exitIcon from '../../public/images/exitIcon.png'
+import contactsIcon from '../../public/images/contactsIcon.png'
+import settingsIcon from '../../public/images/settingsIcon.png'
+import infoIcon from '../../public/images/infoIcon.png'
+import mainIcon from '../../public/images/mainIcon.png'
+import Link from "next/link";
+
+
 
 const SideBarMain = () => {
 
     const userName = useUserStore((state) => state.user_name)
     const userSurname = useUserStore((state) => state.user_surname)
 
-    function test (){
-      toast.success('click')
-    }
-
     interface iCurs{
       id: number,
       title: string,
       icon?: any,
-      nav: () => void,
+      nav: string,
     }
 
     const cursArr:iCurs[] = [
-      {id: 1, title: 'Разработка', nav: test},
-      {id: 2, title: 'Экология', nav: test},
-      {id: 3, title: 'Экономика', nav: test},
-      {id: 4, title: 'Английский', nav: test},
+      {id: 1, title: 'Разработка', nav: '/main/courses'},
+      {id: 2, title: 'Экология', nav: '/main/courses'},
+      {id: 3, title: 'Экономика', nav: '/main/courses'},
+      {id: 4, title: 'Английский', nav: '/main/courses'},
     ]
 
     const otherSidebarItems:iCurs[] = [
-      {id: 1, title: 'Прохожу', nav: test, icon: cursesIcon},
-      {id: 2, title: 'Контакты', nav: test, icon: cursesIcon},
-      {id: 3, title: 'Настройки', nav: test, icon: cursesIcon},
-      {id: 4, title: 'Информация о проекте', nav: test, icon: cursesIcon},
+      {id: 1, title: 'Главная', nav: '/main', icon: mainIcon},
+      {id: 2, title: 'Прохожу', nav: '/main/courses', icon: cursesIcon},
+      {id: 3, title: 'Контакты', nav: '/main/courses', icon: contactsIcon},
+      {id: 4, title: 'Настройки', nav: '/main/courses', icon: settingsIcon},
+      {id: 5, title: 'Информация о проекте', nav: '/main/courses', icon: infoIcon},
     ]
+
+    function clickHandler(name: string){
+      return () => {
+        toast.success(`Переход на "${name}"`)
+
+      }
+    }
 
     return(
     <Sidebar>
@@ -77,7 +90,7 @@ const SideBarMain = () => {
         <SidebarMenuItem>
           <Collapsible>
             <CollapsibleTrigger asChild>
-              <SidebarMenuButton className="cursor-pointer p-6 font-bold" onClick={test}>
+              <SidebarMenuButton className="cursor-pointer p-6 font-bold" >
                 <Image 
                   height={28}
                   width={28}
@@ -90,7 +103,12 @@ const SideBarMain = () => {
             <CollapsibleContent>
               <SidebarMenuSub>
                 {cursArr.map((res) => (
-                  <SidebarMenuSubItem key={res.id} onClick={res.nav}>{res.title}</SidebarMenuSubItem>
+                  <Link
+                    key={res.id}
+                    href={res.nav}
+                  >
+                    <SidebarMenuSubItem onClick={clickHandler(res.title)}>{res.title}</SidebarMenuSubItem>
+                  </Link>
                 ))}
               </SidebarMenuSub>
             </CollapsibleContent>
@@ -100,19 +118,36 @@ const SideBarMain = () => {
         {/* Второе меню (без выпадашки) */}
         <SidebarMenuItem>
           {otherSidebarItems.map((res) => (
-              <SidebarMenuButton key={res.id} className="cursor-pointer p-6 font-bold" onClick={res.nav}>
+            <Link
+              key={res.id}
+              href={res.nav}
+            >
+              <SidebarMenuButton className="cursor-pointer p-6 font-bold" onClick={clickHandler(res.title)}>
                 <Image 
-                  height={28}
-                  width={28}
+                  className="p-1 border-2 rounded-sm shadow-xl"
+                  height={36}
+                  width={36}
                   src={res.icon} 
                   alt="курсы" 
                 />
                 <p>{res.title}</p>
               </SidebarMenuButton>
+            </Link>
             ))}
         </SidebarMenuItem>
 
       </SidebarContent>
+
+      {/* Футер (выход из аккаунта и переход на старт) */}
+      <SidebarFooter>
+        <Image 
+          className="p-3 border-2 rounded-sm shadow-xl"
+          height={48}
+          width={48}
+          src={exitIcon} 
+          alt="курсы" 
+        />
+      </SidebarFooter>
     </Sidebar>
     )
 }

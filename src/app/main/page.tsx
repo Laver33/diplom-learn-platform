@@ -1,5 +1,7 @@
 'use client'
 
+import MainDescription from "@/components/mainDescription";
+import MainWelcome from "@/components/mainWelcome";
 import { useRequireAuth } from "@/lib/auth-check";
 
 
@@ -7,11 +9,11 @@ const MainPage = () =>{
     useRequireAuth()
 
     return(
-        <>
-         <p>Основной контент</p>
+        <div>
+            <MainWelcome />
+            <MainDescription />
         
-        
-        </>
+        </div>
     )
 }
 
