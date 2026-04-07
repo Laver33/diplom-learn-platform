@@ -13,7 +13,7 @@ export default function MainLayout ({
         <SidebarProvider>
             <div className="flex min-h-screen">
                 <SideBarMain/>
-                <main className="flex-1 p-8"> 
+                <main className=" p-8 bg-gray-100"> 
                     {children}
                 </main>
             </div>

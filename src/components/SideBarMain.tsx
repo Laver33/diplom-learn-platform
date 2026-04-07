@@ -14,6 +14,8 @@ import {
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import toast from "react-hot-toast";
 import Image  from "next/image";
+import Link from "next/link";
+import { auth } from "@/lib/firebase/config";
 
 // Импорты иконок
 import educateIcon from '../../public/images/educateIcon.png'
@@ -23,12 +25,12 @@ import contactsIcon from '../../public/images/contactsIcon.png'
 import settingsIcon from '../../public/images/settingsIcon.png'
 import infoIcon from '../../public/images/infoIcon.png'
 import mainIcon from '../../public/images/mainIcon.png'
-import Link from "next/link";
+import customIcon from '../../public/images/customIcon.png'
+
 
 
 
 const SideBarMain = () => {
-
     const userName = useUserStore((state) => state.user_name)
     const userSurname = useUserStore((state) => state.user_surname)
 
@@ -51,13 +53,22 @@ const SideBarMain = () => {
       {id: 2, title: 'Прохожу', nav: '/main/courses', icon: cursesIcon},
       {id: 3, title: 'Контакты', nav: '/main/courses', icon: contactsIcon},
       {id: 4, title: 'Настройки', nav: '/main/courses', icon: settingsIcon},
-      {id: 5, title: 'Информация о проекте', nav: '/main/courses', icon: infoIcon},
+      {id: 5, title: 'Кастомизация', nav: '/main/courses', icon: customIcon},
+      {id: 6, title: 'Информация о проекте', nav: '/main/courses', icon: infoIcon},
     ]
 
     function clickHandler(name: string){
       return () => {
         toast.success(`Переход на "${name}"`)
 
+      }
+    }
+
+    function exitHandler (){
+      return () => {
+        toast.success('Выход завершен');
+        auth.signOut();
+        window.location.href = '/';
       }
     }
 
@@ -146,6 +157,7 @@ const SideBarMain = () => {
           width={48}
           src={exitIcon} 
           alt="курсы" 
+          onClick={exitHandler()}
         />
       </SidebarFooter>
     </Sidebar>
