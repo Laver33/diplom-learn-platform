@@ -26,6 +26,7 @@ import settingsIcon from '../../public/images/settingsIcon.png'
 import infoIcon from '../../public/images/infoIcon.png'
 import mainIcon from '../../public/images/mainIcon.png'
 import customIcon from '../../public/images/customIcon.png'
+import { useEffect, useState } from "react";
 
 
 
@@ -34,6 +35,21 @@ const SideBarMain = () => {
     const userName = useUserStore((state) => state.user_name)
     const userSurname = useUserStore((state) => state.user_surname)
 
+    // Админка
+    const [userRole, setUserRole] = useState<string | null>(null);
+    
+    useEffect(() => {
+      const unsubscribe = auth.onAuthStateChanged(async (user) => {
+        if (user) {
+          const tokenResult = await user.getIdTokenResult(true);
+          setUserRole((tokenResult.claims.role as string) ?? null);
+        } else {
+          setUserRole(null);
+        }
+      });
+      return unsubscribe;
+    }, []);
+
     interface iCurs{
       id: number,
       title: string,
@@ -41,11 +57,13 @@ const SideBarMain = () => {
       nav: string,
     }
 
+    // Данные
+
     const cursArr:iCurs[] = [
-      {id: 1, title: 'Разработка', nav: '/main/courses'},
-      {id: 2, title: 'Экология', nav: '/main/courses'},
-      {id: 3, title: 'Экономика', nav: '/main/courses'},
-      {id: 4, title: 'Английский', nav: '/main/courses'},
+      {id: 1, title: 'Разработка', nav: '/main/courses/develop-course'},
+      {id: 2, title: 'Экология', nav: '/main/courses/ekologiya-course'},
+      {id: 3, title: 'Экономика', nav: '/main/courses/ekonomika-course'},
+      {id: 4, title: 'Английский', nav: '/main/courses/eng-course'},
     ]
 
     const otherSidebarItems:iCurs[] = [
@@ -146,6 +164,18 @@ const SideBarMain = () => {
             </Link>
             ))}
         </SidebarMenuItem>
+
+        {/* Админка */}
+        {userRole === 'admin' ? <SidebarMenuItem>
+          <Link
+            href={'/main/adminpanel'}
+          >
+            <SidebarMenuButton className="cursor-pointer p-6 font-bold">
+              <p>Админ-панель</p>
+            </SidebarMenuButton>
+          </Link>
+        </SidebarMenuItem> : null}
+
 
       </SidebarContent>
 

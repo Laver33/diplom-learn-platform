@@ -9,11 +9,12 @@ import { useRequireAuth } from "@/lib/auth-check";
 const MainPage = () =>{
     useRequireAuth()
     
+    const mainDescription = 'Рады вас снова видеть, какой замечательный день! Данная страница содержит информацию.'
 
     return(
         <div>
             <MainWelcome />
-            <MainDescription />
+            <MainDescription description={mainDescription} />
             <MainStatistic />
 
         </div>

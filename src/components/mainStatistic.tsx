@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import mainIcon from '../../public/images/mainIcon.png'
 import { useCustomStore } from "@/app/store/customStore";
+import { useUserStore } from "@/app/store/userStore";
 
 
 interface iStatCard {
@@ -10,6 +11,7 @@ interface iStatCard {
     title: string
     icon: StaticImageData,
     bgColor: string,
+    storeData: number
 }
 
 
@@ -18,7 +20,10 @@ const MainStatistic = () => {
 
     // Стор
     const cardBgColor = useCustomStore((state) => state.card_statistic_color);
-
+    const completedTest = useUserStore((state) => state.user_test_count);
+    const startCourses = useUserStore((state) => state.user_courses_start_count);
+    const completedCourses = useUserStore((state) => state.user_courses_completed_count);
+    const userLvl = useUserStore((state) => state.user_lvl);
 
     const [widthScreen, setWidthScreen] = useState(1024);
 
@@ -27,10 +32,10 @@ const MainStatistic = () => {
     }, []);
 
     const statsCardContant:iStatCard[] = [
-        {id: 1, title: 'Пройдено тестов', icon: mainIcon, bgColor: '#b3fdfb'},
-        {id: 2, title: 'Начатых курсов', icon: mainIcon, bgColor: '#eab2ff'},
-        {id: 3, title: 'Пройдено курсов', icon: mainIcon, bgColor: '#b5ffb4'},
-        {id: 4, title: 'Уровень', icon: mainIcon, bgColor: '#ffeeac'},
+        {id: 1, title: 'Пройдено тестов', icon: mainIcon, bgColor: '#b3fdfb', storeData: completedTest},
+        {id: 2, title: 'Начатых курсов', icon: mainIcon, bgColor: '#eab2ff' , storeData: startCourses},
+        {id: 3, title: 'Пройдено курсов', icon: mainIcon, bgColor: '#b5ffb4', storeData: completedCourses},
+        {id: 4, title: 'Уровень', icon: mainIcon, bgColor: '#ffeeac',         storeData: userLvl},
     ]
 
 
@@ -44,7 +49,7 @@ const MainStatistic = () => {
                 >
                     <div className="content-card">
                         <p>{res.title}</p>
-                        <p>numbers</p>
+                        <p>{res.storeData}</p>
                     </div>
 
                     <div

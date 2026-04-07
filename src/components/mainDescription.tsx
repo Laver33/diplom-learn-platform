@@ -1,10 +1,10 @@
 
 
-const MainDescription = () => {
+const MainDescription = (props: {description: string}) => {
 
     return(
         <div className="py-1">
-            <p className="text-gray-500">Рады вас снова видеть, какой замечательный день! Данная страница содержит информацию.</p>
+            <p className="text-gray-500">{props.description}</p>
         </div>
     )
 }
