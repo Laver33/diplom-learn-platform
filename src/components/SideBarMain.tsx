@@ -21,11 +21,9 @@ import { auth } from "@/lib/firebase/config";
 import educateIcon from '../../public/images/educateIcon.png'
 import cursesIcon from '../../public/images/cursesIcon.png'
 import exitIcon from '../../public/images/exitIcon.png'
-import contactsIcon from '../../public/images/contactsIcon.png'
 import settingsIcon from '../../public/images/settingsIcon.png'
 import infoIcon from '../../public/images/infoIcon.png'
 import mainIcon from '../../public/images/mainIcon.png'
-import customIcon from '../../public/images/customIcon.png'
 import { useEffect, useState } from "react";
 
 
@@ -69,10 +67,8 @@ const SideBarMain = () => {
     const otherSidebarItems:iCurs[] = [
       {id: 1, title: 'Главная', nav: '/main', icon: mainIcon},
       {id: 2, title: 'Прохожу', nav: '/main/courses', icon: cursesIcon},
-      {id: 3, title: 'Контакты', nav: '/main/courses', icon: contactsIcon},
-      {id: 4, title: 'Настройки', nav: '/main/courses', icon: settingsIcon},
-      {id: 5, title: 'Кастомизация', nav: '/main/courses', icon: customIcon},
-      {id: 6, title: 'Информация о проекте', nav: '/main/courses', icon: infoIcon},
+      {id: 3, title: 'Настройки', nav: '/main/settings', icon: settingsIcon},
+      {id: 4, title: 'Информация о проекте', nav: '/main/courses', icon: infoIcon},
     ]
 
     function clickHandler(name: string){

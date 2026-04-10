@@ -7,8 +7,9 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useRedirectIfAuth } from "@/lib/auth-check"
-import { auth } from "@/lib/firebase/config"
+import { auth, db } from "@/lib/firebase/config"
 import { createUserWithEmailAndPassword } from "firebase/auth"
+import { addDoc, collection, doc, setDoc } from "firebase/firestore"
 import Link from "next/link"
 import { useState } from "react"
 import toast from "react-hot-toast"
@@ -39,9 +40,26 @@ const SignUP = () => {
         }
 
 
-        createUserWithEmailAndPassword(auth, email, password).then((user) => {
+
+        createUserWithEmailAndPassword(auth, email, password).then(async (userCredential) => {
+
+            // Данные в FireStore
+            const user = userCredential.user;
+            const userUID = user.uid;
+
+            const userRef = doc(db, "users", userUID);
+            await setDoc(userRef, {  
+                email: email,
+                name: "",        
+                surname: "",  
+                score: 0,   
+                createdAt: new Date().toISOString(),
+            });
+
+            
+
             toast.success('Успешно')
-            console.log(user);
+            console.log(userCredential);
             setEmail("");
             setPassword("");
             setPasswordCopy("");

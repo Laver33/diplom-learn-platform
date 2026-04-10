@@ -1,4 +1,4 @@
-import CoursesTitle from "@/components/coursesTitle";
+import PagesTitle from "@/components/pagesTitle";
 import MainDescription from "@/components/mainDescription";
 
 
@@ -13,7 +13,7 @@ const developmentCoursesPage = () => {
 
     return(
         <div>
-            <CoursesTitle title={titleCourses} />
+            <PagesTitle title={titleCourses} />
             <MainDescription description={descCourses} />
 
         </div>

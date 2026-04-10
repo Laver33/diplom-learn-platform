@@ -22,7 +22,7 @@ const SignIn = () => {
     const [password, setPassword] = useState<string>("")
     const [error, setError] = useState(false);
 
-    const login = (e: any) => {
+    const login = async (e: any) => {
         e.preventDefault();
 
 
@@ -30,6 +30,8 @@ const SignIn = () => {
             toast.error('Пароль должен быть минимум 6 символов')
             return
         }
+
+
 
 
         signInWithEmailAndPassword(auth, email, password).then((user) => {

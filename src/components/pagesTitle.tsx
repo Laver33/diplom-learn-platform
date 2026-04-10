@@ -1,7 +1,7 @@
 
 
 
-const CoursesTitle = (props: {title: string}) => {
+const PagesTitle = (props: {title: string}) => {
     return(
         <div>
             <h2 className="text-2xl"
@@ -10,4 +10,4 @@ const CoursesTitle = (props: {title: string}) => {
     )
 }
 
-export default CoursesTitle
+export default PagesTitle
