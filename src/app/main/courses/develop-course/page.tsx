@@ -1,5 +1,7 @@
+'use client'
 import PagesTitle from "@/components/pagesTitle";
 import MainDescription from "@/components/mainDescription";
+import CoursesList from "@/components/coursesList";
 
 
 
@@ -15,6 +17,7 @@ const developmentCoursesPage = () => {
         <div>
             <PagesTitle title={titleCourses} />
             <MainDescription description={descCourses} />
+            <CoursesList />
 
         </div>
     )
