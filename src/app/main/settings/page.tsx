@@ -36,36 +36,61 @@ const SettingPage = () => {
         <div>
             <CoursesTitle title={titleSettings} />
 
-            {/* Пользовательские настройки */}
-            <div style={{ width: '100%'}} className="profile-settings mt-3 p-4 border">
-                <CoursesTitle title="Настройки пользователя"/>
+            <div className="first-wrap flex gap-10">
 
-                <div className="data-user flex gap-3 mt-3">
-                    <InputText 
-                        value={userName} 
-                        place={`Имя: ${user_name}`} 
-                        titleField={"Имя"} 
-                        setFunc={setTempUserName}
-                    />
-                    <InputText 
-                        value={userSurname} 
-                        place={`Фамилия: ${user_surname}`} 
-                        titleField={`Фамилия`} 
-                        setFunc={setTempUserSurname}
-                    />
+                {/* Пользовательские настройки */}
+                <div className="w-1/1 profile-settings mt-4 p-4 border rounded-2xl">
+                    <CoursesTitle title="Настройки пользователя"/>
+
+                    <div className="data-user flex gap-3 mt-5">
+                        <InputText 
+                            value={userName} 
+                            place={`Имя: ${user_name}`} 
+                            titleField={"Имя"} 
+                            setFunc={setTempUserName}
+                        />
+                        <InputText 
+                            value={userSurname} 
+                            place={`Фамилия: ${user_surname}`} 
+                            titleField={`Фамилия`} 
+                            setFunc={setTempUserSurname}
+                        />
+                    </div>
+
+                    <Button 
+                        className="p-3 mt-5" 
+                        onClick={saveUserInfo}
+                    >
+                        Сохранить</Button>
                 </div>
 
-                <Button 
-                    className="p-3 mt-3" 
-                    onClick={saveUserInfo}
-                >
-                    Сохранить</Button>
-            </div>
 
-            {/* Настройки стилей сайта */}
-            <div className="style-settings">
-                
+                {/* Настройки стилей сайта */}
+                <div className="style-settings w-1/1 mt-4 p-4 border rounded-2xl">
+                    <CoursesTitle title="Настройки стилей интерфейса"/>
 
+                    <div className="data-user flex gap-3 mt-5">
+                        <InputText 
+                            value={userName} 
+                            place={`Имя: ${user_name}`} 
+                            titleField={"Имя"} 
+                            setFunc={setTempUserName}
+                        />
+                        <InputText 
+                            value={userSurname} 
+                            place={`Фамилия: ${user_surname}`} 
+                            titleField={`Фамилия`} 
+                            setFunc={setTempUserSurname}
+                        />
+                    </div>
+
+                    <Button 
+                        className="p-3 mt-5" 
+                        onClick={saveUserInfo}
+                    >
+                        Сохранить</Button>
+
+                </div>
 
             </div>
 

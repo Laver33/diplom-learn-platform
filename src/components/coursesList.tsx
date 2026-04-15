@@ -1,13 +1,14 @@
 'use client'
+
 import { useCourses } from "@/hooks/queries/useCourses"
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter, CardAction } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
-const CoursesList = () => {
-    const { data: courses, isLoading, error } = useCourses()
+const CoursesList = (props: {typeHook: string}) => {
+    const { data: courses, isLoading, error } = useCourses(props.typeHook)
 
-    if (isLoading) return <div className="text-4xl">Загрузка...</div>
+    if (isLoading) return <div className="text-4xl flex justify-center items-center h-screen">Загрузка...</div>
     if (error) return <div>Ошибка: {error.message}</div>
 
     return(
@@ -15,9 +16,9 @@ const CoursesList = () => {
             <h2 className="text-2xl mb-4">Список курсов</h2>
 
             <div className="overflow-y-auto">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 px-4">
                     {courses?.map(course => (
-                        <Card key={course.id} className="w-80 hover:shadow-xl hover:duration-500">
+                        <Card key={course.id} className="w-11/12 hover:shadow-xl hover:duration-500">
                             <img
                                 src={course.image || "https://avatar.vercel.sh/shadcn1"}
                                 alt={course.title}
