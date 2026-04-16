@@ -1,17 +1,26 @@
-const admin = require('firebase-admin');
+// import { doc, getDoc } from "firebase/firestore";
+// import { db } from "./config";
 
-const serviceAccount = require('./path/to/your-key.json');
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+// const admin = require('firebase-admin');
 
-const uid = process.env.NEXT_PUBLIC_FIREBASE_ADMIN_UID;
-const role = "admin"; 
+// const serviceAccount = require('./path/to/your-key.json');
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+// });
 
-admin.auth().setCustomUserClaims(uid, { role: role })
-  .then(() => {
-    console.log(`Роль ${role} успешно выдана пользователю ${uid}`);
-  })
-  .catch((error: any) => {
-    console.log('Ошибка:', error);
-  });
+// const uid = process.env.NEXT_PUBLIC_FIREBASE_ADMIN_UID;
+// const role = "admin"; 
+
+// admin.auth().setCustomUserClaims(uid, { role: role })
+//   .then(() => {
+//     console.log(`Роль ${role} успешно выдана пользователю ${uid}`);
+//   })
+//   .catch((error: any) => {
+//     console.log('Ошибка:', error);
+//   });
+
+
+// admin.auth().setCustomUserClaims(uid, { role: role } )
+//   .then(() => {
+//     getDoc(doc(db, "users", "id"))
+//   })

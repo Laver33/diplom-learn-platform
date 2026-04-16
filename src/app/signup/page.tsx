@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { useRedirectIfAuth } from "@/lib/auth-check"
 import { auth, db } from "@/lib/firebase/config"
 import { createUserWithEmailAndPassword } from "firebase/auth"
-import { addDoc, collection, doc, setDoc } from "firebase/firestore"
+import { doc, setDoc } from "firebase/firestore"
 import Link from "next/link"
 import { useState } from "react"
 import toast from "react-hot-toast"
@@ -23,8 +23,6 @@ const SignUP = () => {
     const [passwordCopy, setPasswordCopy] = useState<string>("")  
     const [error, setError] = useState(false);
 
-    // const data = Date()
-    // const [regData, setRegData] = useState("")
 
     const registerCheck = (e: any) => {
         e.preventDefault();
@@ -52,6 +50,7 @@ const SignUP = () => {
                 email: email,
                 name: "",        
                 surname: "",  
+                role: 'user',
                 score: 0,   
                 createdAt: new Date().toISOString(),
             });
