@@ -16,6 +16,9 @@ import toast from "react-hot-toast";
 import Image  from "next/image";
 import Link from "next/link";
 import { auth, db } from "@/lib/firebase/config";
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 
 // Импорты иконок
 import educateIcon from '../../public/images/educateIcon.png'
@@ -24,9 +27,7 @@ import exitIcon from '../../public/images/exitIcon.png'
 import settingsIcon from '../../public/images/settingsIcon.png'
 import infoIcon from '../../public/images/infoIcon.png'
 import mainIcon from '../../public/images/mainIcon.png'
-import { useEffect, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
+
 
 
 
@@ -40,9 +41,8 @@ const SideBarMain = () => {
     const [userRole, setUserRole] = useState<string | null>(null);
     
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            console.log("Auth state changed:", user?.uid || "no user");
-            
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {   
+
             // обязательно проверка на пустоту 
             if (!user) {
                 setUserRole(null);
@@ -56,15 +56,13 @@ const SideBarMain = () => {
                 if (docSnap.exists()) {
                     const userData = docSnap.data();
                     setUserRole(userData.role || null);
-                    // console.log("Роль: ", userData.role);
-                } else {
+                  } else {
                     setUserRole(null);
+                  }
+                } catch (error) {
+                  setUserRole(null);
                 }
-            } catch (error) {
-                setUserRole(null);
-            }
-            
-        });
+              });
 
         return () => unsubscribe(); 
     }, []);
