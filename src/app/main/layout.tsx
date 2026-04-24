@@ -6,34 +6,32 @@ import { auth } from "@/lib/firebase/config";
 import { useEffect } from "react";
 import { useUserStore } from '@/app/store/userStore';
 
-export default function MainLayout ({
+export default function MainLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) { 
-    useRequireAuth()
-    const { fetchUserData } = useUserStore();
+  useRequireAuth()
+  const { fetchUserData } = useUserStore();
 
-      useEffect(() => {
-    // Проверка состояния
+  useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         console.log('Пользователь авторизован, загружаем данные...');
         fetchUserData(); 
       } 
     });
-
     return () => unsubscribe();
   }, [fetchUserData]);
-    return(
-        <SidebarProvider>
-            <div className="flex min-h-screen">
-                <SideBarMain/>
-                <main style={{ width: '100%'}} className=" p-8 bg-gray-100"> 
-                    {children}
-                </main>
-            </div>
-
-        </SidebarProvider>
-    )
+  
+  return(
+    <SidebarProvider>
+      <div className="flex min-h-screen bg-gray-100"> 
+        <SideBarMain/>
+        <main className="flex-1 p-8 bg-gray-100"> 
+          {children}
+        </main>
+      </div>
+    </SidebarProvider>
+  )
 }

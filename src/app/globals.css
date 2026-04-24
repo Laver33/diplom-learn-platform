@@ -4,6 +4,21 @@
 
 @custom-variant dark (&:is(.dark *));
 
+html, body {
+  background-color: #f3f4f6; 
+  margin: 0;
+  padding: 0;
+}
+
+[data-slot="sidebar-wrapper"] {
+  min-height: 100vh !important;
+}
+
+
+body {
+  background: #f3f4f6;
+}
+
 
 /*
 :root {
