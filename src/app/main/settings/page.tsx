@@ -16,16 +16,19 @@ const SettingPage = () => {
     const descSettings = 'Раздел в котором вы можете настроить ваше имя и кастомизировать интерфейс под ваш вкус.'
     const titleBtn = 'Сохранить'
 
-    const { user_surname, user_name, updateUserName, updateUserSurname } = useUserStore();
+    const { user_surname, user_name, updateUserName, updateUserSurname, user_email, updateUserEmail } = useUserStore();
 
     const [userName, setTempUserName] = useState('')
     const [userSurname, setTempUserSurname] = useState('')
+    const [userEmail, setTempUserEmail] = useState('')
 
     const saveUserInfo = async () => {
         if (userName.trim() == '' || userSurname.trim() == '') {
             toast.error('Есть пустое поле')
             return
         }
+
+        await updateUserEmail(userEmail.trim())
         await updateUserName(userName.trim())
         await updateUserSurname(userSurname.trim())
     }
@@ -87,15 +90,15 @@ const SettingPage = () => {
                     <div className="data-user flex gap-5 mt-5">
                         <InputText 
                             value={userName} 
-                            place={`Имя: ${user_name}`} 
-                            titleField={"Имя"} 
+                            place={`пуст`} 
+                            titleField={"Пароль"} 
                             setFunc={setTempUserName}
                         />
                         <InputText 
-                            value={userSurname} 
-                            place={`Фамилия: ${user_surname}`} 
-                            titleField={`Фамилия`} 
-                            setFunc={setTempUserSurname}
+                            value={userEmail} 
+                            place={`Почта: ${user_email}`} 
+                            titleField={`Почта`} 
+                            setFunc={setTempUserEmail}
                         />
                     </div>
 

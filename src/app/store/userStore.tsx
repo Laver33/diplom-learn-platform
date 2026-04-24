@@ -6,6 +6,7 @@ interface UserState {
     user_name: string
     user_surname: string,
     user_score: number,
+    user_email: string,
 
     // Для статистики
     user_test_count: number,
@@ -25,7 +26,7 @@ interface UserState {
     updateUserName: (name: string) => Promise<void>;  
     updateUserSurname: (surname: string) => Promise<void>; 
     updateUserScore: (score: number) => Promise<void>;     
-
+    updateUserEmail: (email: string) => Promise<void>;     
 }
 
 export const useUserStore = create<UserState>()(
@@ -34,6 +35,7 @@ export const useUserStore = create<UserState>()(
         user_name: 'Имя',
         user_surname: 'Фамилия',
         user_score: 0,
+        user_email: '',
 
         // Для статистики
         user_test_count: 0,
@@ -47,7 +49,7 @@ export const useUserStore = create<UserState>()(
         setUsername: (name) => set({ user_name: name }),
         setUsersurname: (surname) => set({ user_surname: surname }),
 
-        // Для работы с БД ( FireStore )
+        // Для работы с БД ( FireStore ), данные
         fetchUserData: async () => {
             set({ isLoading: true });
             
@@ -71,6 +73,7 @@ export const useUserStore = create<UserState>()(
                         user_name: data.name || '',
                         user_surname: data.surname || '',
                         user_score: data.score || 0,
+                        user_email: data.email || '',
                         isLoading: false,
                     });
                     console.log('Данные пользователя загружены:', data);
@@ -99,6 +102,24 @@ export const useUserStore = create<UserState>()(
                 console.error('Ошибка обновления фамилии:', error);
             }
         },
+
+        // Почта
+        updateUserEmail: async (email: string) => {
+            try {
+                const currentUser = auth.currentUser;
+                if (!currentUser) return;
+                
+                const userRef = doc(db, 'users', currentUser.uid);
+                await updateDoc(userRef, { email });
+                
+                set({ user_email: email });
+                console.log('Почта обновлена:', email);
+            } catch (error) {
+                console.error('Ошибка обновления почты:', error);
+            }
+        },
+
+
 
         // Имя
         updateUserName: async (name: string) => {
