@@ -69,17 +69,17 @@ const SideBarMain = () => {
     }
 
     const cursArr:iCurs[] = [
-      {id: 1, title: 'Разработка', nav: '/main/courses/develop-course'},
-      {id: 2, title: 'Экология', nav: '/main/courses/ekologiya-course'},
-      {id: 3, title: 'Экономика', nav: '/main/courses/ekonomika-course'},
-      {id: 4, title: 'Английский', nav: '/main/courses/eng-course'},
+      {id: 1, title: 'Разработка', nav: '/courses/develop-course'},
+      {id: 2, title: 'Экология', nav: '/courses/ekologiya-course'},
+      {id: 3, title: 'Экономика', nav: '/courses/ekonomika-course'},
+      {id: 4, title: 'Английский', nav: '/courses/eng-course'},
     ]
 
     const otherSidebarItems:iCurs[] = [
-      {id: 1, title: 'Главная', nav: '/main', icon: mainIcon},
-      {id: 2, title: 'Прохожу', nav: '/main/courses', icon: cursesIcon},
-      {id: 3, title: 'Настройки', nav: '/main/settings', icon: settingsIcon},
-      {id: 4, title: 'Информация о проекте', nav: '/main/information', icon: infoIcon},
+      {id: 1, title: 'Главная', nav: '/', icon: mainIcon},
+      {id: 2, title: 'Прохожу', nav: '/courses', icon: cursesIcon},
+      {id: 3, title: 'Настройки', nav: '/settings', icon: settingsIcon},
+      {id: 4, title: 'Информация о проекте', nav: '/information', icon: infoIcon},
     ]
 
     function clickHandler(name: string){

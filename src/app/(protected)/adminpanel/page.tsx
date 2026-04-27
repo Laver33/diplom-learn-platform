@@ -98,6 +98,14 @@ const adminPanel = () => {
                     ))}
                 </div>
             </div>
+
+
+            <div 
+            className="course-panel mt-5 p-8 bg-white rounded-2xl border 
+                border-slate-200 shadow-lg shadow-slate-200/50"
+                >
+                    <p>Курсы</p>
+            </div>
         </div>
     )
 }

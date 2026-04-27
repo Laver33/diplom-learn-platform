@@ -4,6 +4,7 @@ import { useCourses } from "@/hooks/queries/useCourses"
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter, CardAction } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 const CoursesList = (props: {typeHook: string}) => {
     const { data: courses, isLoading, error } = useCourses(props.typeHook)
@@ -42,7 +43,9 @@ const CoursesList = (props: {typeHook: string}) => {
                             </CardHeader>
                             
                             <CardFooter className="h-20">
-                                <Button className="w-full p-5 font-bold text-sm cursor-pointer">Начать</Button>
+                                <Link href={`/course/${course.id}`}>
+                                    <Button className="w-full p-5 font-bold text-sm cursor-pointer">Посмотреть</Button>
+                                </Link>
                             </CardFooter>
                         </Card>
                     ))}
