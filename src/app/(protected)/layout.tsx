@@ -6,6 +6,8 @@ import { auth } from "@/lib/firebase/config";
 import { useEffect } from "react";
 import { useUserStore } from '@/app/store/userStore';
 
+
+
 export default function MainLayout({
   children,
 }: Readonly<{
@@ -26,12 +28,10 @@ export default function MainLayout({
   
   return(
     <SidebarProvider>
-      <div className="flex min-h-screen bg-gray-100"> 
         <SideBarMain/>
-        <main className="flex-1 p-8 bg-gray-100"> 
+        <main className="flex-1 p-8 bg-gray-100 overflow-visible">
           {children}
         </main>
-      </div>
     </SidebarProvider>
   )
 }

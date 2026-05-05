@@ -7,7 +7,7 @@ const SettingsSaveIcon = (props: {funcBtn: () => {}, title:string }) => {
     
     <div className="btn flex justify-end">
         <Button 
-            className="p-4 mt-6 justify-end" 
+            className="p-4 mt-6 " 
             onClick={props.funcBtn}
         >
             {props.title}</Button>

@@ -2,6 +2,7 @@
 
 import MainDescription from "@/components/mainDescription";
 import PagesTitle from "@/components/pagesTitle";
+import { Button } from "@/components/ui/button";
 import { auth, db } from "@/lib/firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -104,7 +105,13 @@ const adminPanel = () => {
             className="course-panel mt-5 p-8 bg-white rounded-2xl border 
                 border-slate-200 shadow-lg shadow-slate-200/50"
                 >
-                    <p>Курсы</p>
+                    <div className="content flex gap-2 items-center">
+                        <p>Добавить новый курс на сайт </p>
+
+                        <Button
+                            className="p-2 font-bold"
+                        >Добавить</Button>
+                    </div>
             </div>
         </div>
     )

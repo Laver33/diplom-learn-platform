@@ -53,17 +53,23 @@ const SettingPage = () => {
 
                     <div className="data-user flex gap-5 mt-5">
                         <InputText 
+                            maxLength={20}
                             value={userName} 
                             place={`Имя: ${user_name}`} 
                             titleField={"Имя"} 
                             setFunc={setTempUserName}
                         />
                         <InputText 
+                            maxLength={20}
                             value={userSurname} 
                             place={`Фамилия: ${user_surname}`} 
                             titleField={`Фамилия`} 
                             setFunc={setTempUserSurname}
                         />
+                    </div>
+
+                    <div className="settings-rules absolute rounded-2xl mt-2 bg-red-100 p-2">
+                        <p className="text-xs text-red-600 font-extrabold">Макс длина 20</p>
                     </div>
 
                     <div className="mt-6">

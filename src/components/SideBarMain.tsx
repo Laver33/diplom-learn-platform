@@ -92,7 +92,6 @@ const SideBarMain = () => {
       return () => {
         toast.success('Выход завершен');
         auth.signOut();
-        window.location.href = '/';
       }
     }
 
@@ -114,7 +113,7 @@ const SideBarMain = () => {
 
           <div className="sidebar-name flex flex-col ml-1">
             <p className="font-semibold text-slate-800 text-sm leading-tight">{userName}</p>
-            <p className="text-xs text-slate-500 leading-tight">{userSurname}</p>
+            <p className="text-sm text-slate-500 leading-tight">{userSurname}</p>
           </div>
         </div>
       </SidebarHeader>
@@ -206,7 +205,7 @@ const SideBarMain = () => {
         {/* Админка */}
         {userRole === 'admin' ? 
           <SidebarMenuItem className="mt-2 pt-3 border-t border-slate-200/60">
-            <Link href={'/main/adminpanel'}>
+            <Link href={'/adminpanel'}>
               <SidebarMenuButton className="cursor-pointer p-5 font-semibold rounded-xl
                 bg-linear-to-r from-violet-500/10 to-purple-500/10 text-violet-700
                 hover:from-violet-500/20 hover:to-purple-500/20 transition-all duration-500
@@ -254,7 +253,7 @@ const SideBarMain = () => {
           </div>
           <div className="text-left">
             <p className="text-sm font-medium text-slate-600 group-hover:text-red-600 transition-colors">Выйти</p>
-            <p className="text-xs text-slate-400">Завершить сессию</p>
+            <p className="text-xs text-slate-400">Выйти с аккаунта</p>
           </div>
           <svg className="ml-auto w-4 h-4 text-slate-400 group-hover:text-red-500 group-hover:translate-x-1 transition-all" 
             fill="none" stroke="currentColor" viewBox="0 0 24 24">

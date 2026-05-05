@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 
 const CourseDetailPage = () => {
 
-
     const params = useParams()
     const id = params.id as string | undefined
 
@@ -18,12 +17,14 @@ const CourseDetailPage = () => {
         return(<><p>Ошибка</p></>)
     }
 
+
     
     return(
+        
         <div>
             <div 
-                className="grid gap-6 p-12"
-                style={{ background: '#282b41', width: '500px'}}
+                className="grid gap-6 p-12 rounded-sm w-full cursor-default"
+                style={{ background: '#282b41' }}
             >
                 <h2 
                     className="text-white text-4xl font-medium"
@@ -35,7 +36,12 @@ const CourseDetailPage = () => {
 
                 <p
                     className="text-white"
-                >Уровень: {course?.level}</p>
+                >Уровень: {course?.level} </p>
+            </div>
+
+
+            <div className="bg-amber-50">
+                {/* <p>контент</p> */}
             </div>
         
         </div>

@@ -26,7 +26,7 @@ const SignIn = () => {
         e.preventDefault()
 
         if (password.length < 6) {
-            toast.error('Пароль должен быть минимум 6 символов')
+            toast.error('Слишком короткий пароль.')
             return
         }
 

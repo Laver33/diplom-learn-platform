@@ -15,10 +15,7 @@ export function useRequireAuth(redirectTo = '/signin') {
   }, [router, redirectTo])
 }
 
-
-
-
-export function useRedirectIfAuth(redirectTo = '/main') {
+export function useRedirectIfAuth(redirectTo = '/') {  
   const router = useRouter()
   
   useEffect(() => {
