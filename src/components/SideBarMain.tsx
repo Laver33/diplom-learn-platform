@@ -77,7 +77,7 @@ const SideBarMain = () => {
 
     const otherSidebarItems:iCurs[] = [
       {id: 1, title: 'Главная', nav: '/', icon: mainIcon},
-      {id: 2, title: 'Прохожу', nav: '/courses', icon: cursesIcon},
+      {id: 2, title: 'Прохожу', nav: '/dashboard', icon: cursesIcon},
       {id: 3, title: 'Настройки', nav: '/settings', icon: settingsIcon},
       {id: 4, title: 'Информация о проекте', nav: '/information', icon: infoIcon},
     ]

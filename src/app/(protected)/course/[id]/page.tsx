@@ -1,5 +1,7 @@
 'use client'
+import { Button } from "@/components/ui/button";
 import { useCourse } from "@/hooks/queries/useCourse";
+import { ArrowRight, Heart } from "lucide-react";
 import { useParams } from "next/navigation";
 
 
@@ -16,7 +18,6 @@ const CourseDetailPage = () => {
     if (error) {
         return(<><p>Ошибка</p></>)
     }
-
 
     
     return(
@@ -40,8 +41,50 @@ const CourseDetailPage = () => {
             </div>
 
 
-            <div className="bg-amber-50">
-                {/* <p>контент</p> */}
+            {/* Инфа о курсе */}
+            <div className="flex">
+
+                {/* Левая часть */}
+                <div className="left-content w-9/12">
+                    <p>f</p>
+                </div>
+
+                {/* Правая часть */}
+                <div className="right-content grid gap-4 pt-4  w-3/12">
+
+                <div className="btns p-2 grid gap-4">
+
+                    <Button 
+                        className="h-14 bg-green-500 font-semibold text-base hover:bg-green-600 duration-700"
+                    >Поступить на курс</Button>
+
+                    <Button 
+                        variant='outline'
+                        className="h-14  font-semibold text-base"
+                    >   <Heart className="h-4 w-4" />
+                        Хочу пройти</Button>
+
+                </div>
+
+
+
+
+                    <div className="bg-gray-300 p-4 rounded-sm">
+                        <p className="font-bold">Доп информация</p>
+                        
+                        <div className="mt-2">
+                            <p>уроков: </p>
+                            <p>создан: </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+
+
             </div>
         
         </div>

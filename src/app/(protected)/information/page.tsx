@@ -29,22 +29,23 @@ const AboutPage = () => {
         <h2 className="text-2xl font-bold text-slate-800 mb-6">Что мы предлагаем?</h2>
 
         <div className="grid md:grid-cols-2 gap-6 mb-12 cursor-default">
-            <div className="border rounded-xl p-6 hover:shadow-md transition">
+
+            <div className="border rounded-xl p-6 hover:shadow-md transition bg-gray-200">
             <h3 className="text-xl font-semibold text-slate-800 mb-2">📚 Структурированные курсы</h3>
             <p className="text-slate-600">Теория + тесты для закрепления материала</p>
             </div>
 
-            <div className="border rounded-xl p-6 hover:shadow-md transition cursor-default">
+            <div className="border rounded-xl p-6 hover:shadow-md transition cursor-default bg-gray-200">
             <h3 className="text-xl font-semibold text-slate-800 mb-2">📊 Отслеживание прогресса</h3>
             <p className="text-slate-600">Следите за своими достижениями</p>
             </div>
 
-            <div className="border rounded-xl p-6 hover:shadow-md transition cursor-default">
+            <div className="border rounded-xl p-6 hover:shadow-md transition cursor-default bg-gray-200">
             <h3 className="text-xl font-semibold text-slate-800 mb-2">🎯 Разные уровни</h3>
             <p className="text-slate-600">От Интерна до Миддл разработчика</p>
             </div>
 
-            <div className="border rounded-xl p-6 hover:shadow-md transition cursor-default">
+            <div className="border rounded-xl p-6 hover:shadow-md transition cursor-default bg-gray-200">
             <h3 className="text-xl font-semibold text-slate-800 mb-2">🔒 Безопасность</h3>
             <p className="text-slate-600">Ваши данные под надежной защитой</p>
             </div>
@@ -54,7 +55,7 @@ const AboutPage = () => {
         <h2 className="text-2xl font-bold text-slate-800 mb-6">Технологии разработки</h2>
         <div className="flex flex-wrap gap-3 mb-12">
             {["Next.js", "TypeScript", "Firebase", "Tailwind CSS", "Zustand", "Shadcn", "React Query"].map(tech => (
-            <span key={tech} className="bg-slate-100 px-4 py-2 rounded-full text-slate-700 text-sm">
+            <span key={tech} className="bg-slate-200 px-4 py-2 rounded-full text-slate-700 text-sm">
                 {tech}
             </span>
             ))}

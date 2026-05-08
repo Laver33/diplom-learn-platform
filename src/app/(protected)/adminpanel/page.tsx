@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { auth, db } from "@/lib/firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface iUser {
@@ -22,6 +24,8 @@ const adminPanel = () => {
 
     const [userData, setUserData] = useState<iUser>()
     const [error, setError] = useState(false)
+
+    const router = useRouter()
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -108,9 +112,13 @@ const adminPanel = () => {
                     <div className="content flex gap-2 items-center">
                         <p>Добавить новый курс на сайт </p>
 
-                        <Button
-                            className="p-2 font-bold"
-                        >Добавить</Button>
+                        <Link
+                            href={'/adminpanel/addcourses'}
+                        >
+                            <Button
+                                className="p-2 font-bold"
+                            >Добавить</Button>
+                        </Link>
                     </div>
             </div>
         </div>
