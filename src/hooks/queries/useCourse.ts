@@ -13,6 +13,14 @@ export interface iCourse {
   duration?: number  
   image?: string
   longDescription?: string
+
+  // Описание для курсов
+  introduction?: string,
+  writing_guidelines?: string,
+
+  //  иконки
+  icon_1?: string,
+  icon_2?: string,
 }
 
 export const useCourse = (id: string | undefined) => {
