@@ -28,6 +28,7 @@ import settingsIcon from '../../public/images/settingsIcon.png'
 import infoIcon from '../../public/images/infoIcon.png'
 import mainIcon from '../../public/images/mainIcon.png'
 import adminPanelIcon from '../../public/images/adminIcon.png'
+import wishListIcon from '../../public/images/wishlistIcon.png';
 
 const SideBarMain = () => {
     const userName = useUserStore((state) => state.user_name)
@@ -78,8 +79,9 @@ const SideBarMain = () => {
     const otherSidebarItems:iCurs[] = [
       {id: 1, title: 'Главная', nav: '/', icon: mainIcon},
       {id: 2, title: 'Прохожу', nav: '/dashboard', icon: cursesIcon},
-      {id: 3, title: 'Настройки', nav: '/settings', icon: settingsIcon},
-      {id: 4, title: 'Информация о проекте', nav: '/information', icon: infoIcon},
+      {id: 3, title: 'Хочу пройти', nav: '/wishlist', icon: wishListIcon},
+      {id: 4, title: 'Настройки', nav: '/settings', icon: settingsIcon},
+      {id: 5, title: 'Информация о проекте', nav: '/information', icon: infoIcon},
     ]
 
     function clickHandler(name: string){

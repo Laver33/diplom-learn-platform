@@ -12,7 +12,7 @@ const DynamicIcon = ({ name, className = "h-5 w-5" }: DynamicIconProps) => {
   if (!name) return null;
 
   const iconName = name as IconName;
-  const IconComponent = Icons[iconName] as ElementType; // 👈 явное приведение к типу React-компонента
+  const IconComponent = Icons[iconName] as ElementType; 
 
   if (!IconComponent) return null;
 
