@@ -1,4 +1,5 @@
 'use client'
+import { useUserStore } from "@/app/store/userStore";
 import DynamicIcon from "@/components/DynamicIcon";
 import { Button } from "@/components/ui/button";
 import { useCourse } from "@/hooks/queries/useCourse";
@@ -11,6 +12,7 @@ import toast from "react-hot-toast";
 
 const CourseDetailPage = () => {
 
+    const setLike = useUserStore((state) => state.setLikeCourse)
     const params = useParams()
     const id = params.id as string | undefined
 
@@ -44,9 +46,10 @@ const CourseDetailPage = () => {
             const userRef = doc(db, 'users', userId);
             
             await updateDoc(userRef, {
-                coursesArr: arrayUnion(id)
+                coursesArr: arrayUnion(id),
             });
             
+            setLike(true)
             setIsAddCourse(true);
 
             toast('Добавлен в избранное', {
@@ -71,6 +74,7 @@ const CourseDetailPage = () => {
                 coursesArr: arrayRemove(id)
             });
             
+            setLike(false)
             setIsAddCourse(false);
 
             toast('Убран из избранного', {
