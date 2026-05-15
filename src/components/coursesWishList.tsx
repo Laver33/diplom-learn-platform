@@ -5,12 +5,26 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useUserCourses } from "@/hooks/queries/useWishList"
+import { HeartCrack } from "lucide-react"
 
 const CoursesWishList = (props: {userId: string | undefined}) => {
     const { data: courses, isLoading, error } = useUserCourses(props.userId)
 
+    // Стили 
+    const falseStyle = 'flex h-2/3 justify-center items-center text-2xl  gap-4'
+
     if (isLoading) return <div className="text-4xl flex justify-center items-center h-screen">Загрузка...</div>
     if (error) return <div>Ошибка: {error.message}</div>
+
+    if (!courses || courses.length === 0) {
+        return (
+            <div className={falseStyle}>
+                <HeartCrack className="h-5 w-5"/>
+                <p>Вы ничего не выбрали</p>
+            </div>
+        )
+    }
+    
 
     return(
         <div className="py-4">

@@ -16,12 +16,10 @@ interface UserState {
 
     //Загрузка
     isLoading: boolean,
-    isLikeCourse: boolean,
 
     // Функции
     setUsername: (name: string) => void
     setUsersurname: (surname: string) => void
-    setLikeCourse: (isLikeCourse: boolean) => void
 
     // Для работы с БД ( FireStore )
     fetchUserData: () => Promise<void>;  
@@ -52,8 +50,6 @@ export const useUserStore = create<UserState>()(
         setUsername: (name) => set({ user_name: name }),
         setUsersurname: (surname) => set({ user_surname: surname }),
 
-        // Проверка лайка курса
-        setLikeCourse: (like) => set({ isLikeCourse: like}),
 
 
         // Для работы с БД ( FireStore ), данные

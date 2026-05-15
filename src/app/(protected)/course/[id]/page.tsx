@@ -12,7 +12,6 @@ import toast from "react-hot-toast";
 
 const CourseDetailPage = () => {
 
-    const setLike = useUserStore((state) => state.setLikeCourse)
     const params = useParams()
     const id = params.id as string | undefined
 
@@ -49,7 +48,6 @@ const CourseDetailPage = () => {
                 coursesArr: arrayUnion(id),
             });
             
-            setLike(true)
             setIsAddCourse(true);
 
             toast('Добавлен в избранное', {
@@ -74,7 +72,6 @@ const CourseDetailPage = () => {
                 coursesArr: arrayRemove(id)
             });
             
-            setLike(false)
             setIsAddCourse(false);
 
             toast('Убран из избранного', {
