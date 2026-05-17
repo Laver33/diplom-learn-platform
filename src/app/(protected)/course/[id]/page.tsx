@@ -1,5 +1,4 @@
 'use client'
-import { useUserStore } from "@/app/store/userStore";
 import DynamicIcon from "@/components/DynamicIcon";
 import { Button } from "@/components/ui/button";
 import { useCourse } from "@/hooks/queries/useCourse";
