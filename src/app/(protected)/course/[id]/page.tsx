@@ -5,11 +5,16 @@ import { useCourse } from "@/hooks/queries/useCourse";
 import { auth, db } from "@/lib/firebase/config";
 import { doc, updateDoc, arrayUnion, arrayRemove, getDoc } from "firebase/firestore";
 import { Heart } from "lucide-react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
+
 const CourseDetailPage = () => {
+
+    const router = useRouter();
+    const [hasTest, setHasTest] = useState(false);
+    const [testCompleted, setTestCompleted] = useState(false);
 
     const params = useParams()
     const id = params.id as string | undefined
@@ -35,6 +40,10 @@ const CourseDetailPage = () => {
         checkIfInCart();
     }, [userId, id]);
 
+    useEffect(() => {
+        checkTestAndProgress();
+    }, [id, userId]);
+
     // Функция добавления
     async function addToCoursesArr() {
         try {
@@ -57,6 +66,28 @@ const CourseDetailPage = () => {
             return console.log('Error: ', err)
         }
     }
+
+    const checkTestAndProgress = async () => {
+        if (!id) return; // проверка
+        
+        try {
+            // есть ли тест
+            const testRef = doc(db, 'courses', id, 'tests', 'main');
+            const testSnap = await getDoc(testRef);
+            setHasTest(testSnap.exists());
+
+            // Ппрошел или нет
+            if (userId) {
+                const userRef = doc(db, 'users', userId);
+                const userSnap = await getDoc(userRef);
+                const userData = userSnap.data();
+                const progress = userData?.courseProgress?.[id];
+                setTestCompleted(progress?.testCompleted || false);
+            }
+        } catch (error) {
+            console.error('Ошибка проверки теста:', error);
+        }
+    };
 
     // Функция удаления
     async function removeFromCoursesArr() {
@@ -136,12 +167,24 @@ const CourseDetailPage = () => {
 
                 {/* Правая часть */}
                 <div className="right-content grid gap-2 pt-4 w-3/12">
+
                     <div className="btns p-2 h-24 grid gap-1">
                         <Button 
                             className="h-14 bg-green-500 font-semibold text-base hover:bg-green-600 duration-700"
+                            onClick={() => router.push(`/course/${id}/lessons`)}
                         >
-                            Поступить на курс
+                            Начать обучение
                         </Button>
+
+                        {hasTest && (
+                            <Button 
+                                className="h-14 bg-blue-500 font-semibold text-base hover:bg-blue-600 duration-700"
+                                onClick={() => router.push(`/course/${id}/test`)}
+                                disabled={testCompleted}
+                            >
+                                {testCompleted ? '✅ Тест пройден' : '📝 Пройти тест'}
+                            </Button>
+                        )}
 
                         <Button 
                             variant='outline'

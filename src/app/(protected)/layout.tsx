@@ -27,6 +27,7 @@ export default function MainLayout({
   }, [fetchUserData]);
   
   return(
+    
     <SidebarProvider>
         <SideBarMain/>
         <main className="flex-1 p-8 bg-gray-100 overflow-visible">
