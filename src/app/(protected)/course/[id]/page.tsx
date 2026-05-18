@@ -9,23 +9,23 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-
 const CourseDetailPage = () => {
 
     const router = useRouter();
     const [hasTest, setHasTest] = useState(false);
     const [testCompleted, setTestCompleted] = useState(false);
+    const [allLessonsCompleted, setAllLessonsCompleted] = useState(false);
+    const [totalLessons, setTotalLessons] = useState(0);
+    const [completedLessonsCount, setCompletedLessonsCount] = useState(0); // НОВОЕ
 
     const params = useParams()
     const id = params.id as string | undefined
 
     const { data: course, isLoading, error } = useCourse(id)
 
-    // Состояние
     const [isAddCourse, setIsAddCourse] = useState(false)
     const userId = auth.currentUser?.uid;
 
-    // Проверка
     useEffect(() => {
         const checkIfInCart = async () => {
             if (!userId || !id) return;
@@ -42,13 +42,11 @@ const CourseDetailPage = () => {
 
     useEffect(() => {
         checkTestAndProgress();
-    }, [id, userId]);
+    }, [id, userId, course]);
 
-    // Функция добавления
     async function addToCoursesArr() {
         try {
-
-            if (!userId) return;
+            if (!userId || !id) return;
             
             const userRef = doc(db, 'users', userId);
             
@@ -68,33 +66,42 @@ const CourseDetailPage = () => {
     }
 
     const checkTestAndProgress = async () => {
-        if (!id) return; // проверка
+        if (!id) return;
         
         try {
-            // есть ли тест
+            // Проверяем наличие теста
             const testRef = doc(db, 'courses', id, 'tests', 'main');
             const testSnap = await getDoc(testRef);
             setHasTest(testSnap.exists());
 
-            // Ппрошел или нет
+            // Получаем количество уроков из курса
+            if (course?.lessons) {
+                setTotalLessons(course.lessons.length);
+            }
+
+            // Проверяем прогресс пользователя
             if (userId) {
                 const userRef = doc(db, 'users', userId);
                 const userSnap = await getDoc(userRef);
                 const userData = userSnap.data();
                 const progress = userData?.courseProgress?.[id];
+                
                 setTestCompleted(progress?.testCompleted || false);
+                
+                // Проверяем, все ли уроки пройдены
+                const completedCount = progress?.completedLessons?.length || 0;
+                setCompletedLessonsCount(completedCount);
+                const lessonsCount = course?.lessons?.length || 0;
+                setAllLessonsCompleted(completedCount >= lessonsCount && lessonsCount > 0);
             }
         } catch (error) {
             console.error('Ошибка проверки теста:', error);
         }
     };
 
-    // Функция удаления
     async function removeFromCoursesArr() {
-
         try {
-
-            if (!userId) return;
+            if (!userId || !id) return;
             
             const userRef = doc(db, 'users', userId);
             
@@ -111,11 +118,13 @@ const CourseDetailPage = () => {
         } catch (err) {
             return console.log('Error: ', err)
         }
-
     }
 
+    // Вычисляем процент прогресса
+    const progressPercent = totalLessons > 0 
+        ? Math.round((completedLessonsCount / totalLessons) * 100)
+        : 0;
 
-    // Проверки
     if (isLoading) {
         return <p>Загрузка...</p>
     }
@@ -142,10 +151,8 @@ const CourseDetailPage = () => {
                 >Уровень: {course?.level} </p>
             </div>
 
-            {/* Инфа о курсе */}
             <div className="flex">
 
-                {/* Левая часть */}
                 <div className="left-content pt-6 grid gap-12 w-9/12 pr-5">
 
                     <div className="description">
@@ -165,12 +172,11 @@ const CourseDetailPage = () => {
                     </div>
                 </div>
 
-                {/* Правая часть */}
                 <div className="right-content grid gap-2 pt-4 w-3/12">
 
-                    <div className="btns p-2 h-24 grid gap-1">
+                    <div className="btns p-2 space-y-2">
                         <Button 
-                            className="h-14 bg-green-500 font-semibold text-base hover:bg-green-600 duration-700"
+                            className="w-full h-14 bg-green-500 font-semibold text-base hover:bg-green-600 duration-700"
                             onClick={() => router.push(`/course/${id}/lessons`)}
                         >
                             Начать обучение
@@ -178,17 +184,19 @@ const CourseDetailPage = () => {
 
                         {hasTest && (
                             <Button 
-                                className="h-14 bg-blue-500 font-semibold text-base hover:bg-blue-600 duration-700"
+                                className="w-full h-14 font-semibold text-base"
+                                variant={allLessonsCompleted && !testCompleted ? "default" : "outline"}
                                 onClick={() => router.push(`/course/${id}/test`)}
-                                disabled={testCompleted}
+                                disabled={!allLessonsCompleted || testCompleted}
                             >
-                                {testCompleted ? '✅ Тест пройден' : '📝 Пройти тест'}
+                                {testCompleted ? '✅ Тест пройден' : 
+                                 allLessonsCompleted ? '📝 Пройти тест' : `🔒 Завершите уроки (${completedLessonsCount}/${totalLessons})`}
                             </Button>
                         )}
 
                         <Button 
                             variant='outline'
-                            className="h-14 font-semibold text-base"
+                            className="w-full h-14 font-semibold text-base"
                             onClick={isAddCourse ? removeFromCoursesArr : addToCoursesArr}
                         >
                             <Heart 
@@ -203,8 +211,18 @@ const CourseDetailPage = () => {
                     <div className="bg-gray-300 p-4 rounded-sm">
                         <p className="font-bold">Доп информация</p>
                         <div className="mt-2">
-                            <p>уроков: </p>
-                            <p>создан: </p>
+                            <p>📚 Уроков: {totalLessons}</p>
+                            <p>📊 Прогресс: {testCompleted ? '✅ 100% (тест пройден)' : allLessonsCompleted ? '🎓 100% (тест доступен)' : `${progressPercent}% (${completedLessonsCount}/${totalLessons})`}</p>
+                            {!allLessonsCompleted && !testCompleted && totalLessons > 0 && (
+                                <p className="text-xs text-gray-600 mt-2">
+                                    ⚠️ Завершите все {totalLessons} уроков, чтобы открыть тест
+                                </p>
+                            )}
+                            {allLessonsCompleted && !testCompleted && hasTest && (
+                                <p className="text-xs text-green-600 mt-2">
+                                    🎉 Все уроки пройдены! Теперь доступен тест
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>

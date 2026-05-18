@@ -21,6 +21,11 @@ export interface iCourse {
   //  иконки
   icon_1?: string,
   icon_2?: string,
+  
+  lessons?: Array<{
+    title: string
+    content: string
+  }>
 }
 
 export const useCourse = (id: string | undefined) => {

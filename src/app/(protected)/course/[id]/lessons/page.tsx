@@ -183,6 +183,7 @@ const CourseLessonsPage = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
                 {/* Список уроков */}
                 <div className="md:col-span-1">
                     <Card>
@@ -257,6 +258,17 @@ const CourseLessonsPage = () => {
                                         Следующий урок →
                                     </Button>
                                 )}
+                                
+                                {completedLessons.includes(currentLesson) && 
+                                currentLesson === course.lessons.length - 1 && (
+                                    <Button
+                                        onClick={() => router.push(`/course/${courseId}`)}
+                                        className="bg-blue-600 hover:bg-blue-700"
+                                    >
+                                        🎓 Завершить курс и вернуться
+                                    </Button>
+                                )}
+                                
                             </div>
                         </CardContent>
                     </Card>
