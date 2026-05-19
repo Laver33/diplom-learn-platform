@@ -3,14 +3,16 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { db, auth } from "@/lib/firebase/config";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { toast } from "react-hot-toast";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, Star } from "lucide-react";
+
+const POINTS_PER_COURSE = 20; // 20 очков за курс
 
 const CourseTestPage = () => {
     const params = useParams();
@@ -24,6 +26,8 @@ const CourseTestPage = () => {
     const [score, setScore] = useState(0);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const [pointsEarned, setPointsEarned] = useState(0);
+    const [levelUp, setLevelUp] = useState(false);
 
     useEffect(() => {
         loadTest();
@@ -68,6 +72,15 @@ const CourseTestPage = () => {
         }
     };
 
+    // Функция для определения уровня по очкам
+    const getLevelByScore = (score: number): number => {
+        if (score >= 400) return 4;
+        if (score >= 300) return 3;
+        if (score >= 200) return 2;
+        if (score >= 100) return 1;
+        return 0;
+    };
+
     const submitTest = async () => {
         // Проверка что все вопросы отвечены
         if (answers.some(a => a === -1)) {
@@ -95,6 +108,29 @@ const CourseTestPage = () => {
             if (userId) {
                 const userRef = doc(db, 'users', userId);
                 
+                // Получаем текущие очки пользователя
+                const userSnap = await getDoc(userRef);
+                const currentScore = userSnap.data()?.score || 0;
+                let newScore = currentScore;
+                let earnedPoints = 0;
+                
+                // Если тест пройден и еще не был пройден
+                const alreadyPassed = userSnap.data()?.courseProgress?.[courseId]?.testPassed;
+                
+                if (passed && !alreadyPassed) {
+                    earnedPoints = POINTS_PER_COURSE;
+                    newScore = currentScore + earnedPoints;
+                    setPointsEarned(earnedPoints);
+                    
+                    // Проверяем повышение уровня
+                    const oldLevel = getLevelByScore(currentScore);
+                    const newLevel = getLevelByScore(newScore);
+                    if (newLevel > oldLevel) {
+                        setLevelUp(true);
+                        toast.success(`🎉 Поздравляем! Вы повысили уровень!`);
+                    }
+                }
+                
                 // Сохраняем результат теста
                 await updateDoc(userRef, {
                     [`completedTests.${courseId}`]: {
@@ -102,19 +138,21 @@ const CourseTestPage = () => {
                         passed: passed,
                         completedAt: new Date().toISOString(),
                         answers: answers
-                    }
-                });
-
-                // Обновляем прогресс курса
-                await updateDoc(userRef, {
+                    },
+                    // Обновляем прогресс курса
                     [`courseProgress.${courseId}`]: {
                         testCompleted: true,
                         testScore: finalScore,
                         testPassed: passed,
                         completedAt: new Date().toISOString()
-                    }
+                    },
+                    // Начисляем очки если тест пройден впервые
+                    ...(passed && !alreadyPassed && { score: increment(POINTS_PER_COURSE) })
                 });
 
+                if (passed && !alreadyPassed) {
+                    toast.success(`✨ Вы получили ${POINTS_PER_COURSE} XP за прохождение курса!`);
+                }
                 toast.success(passed ? 'Поздравляем! Вы прошли тест!' : 'К сожалению, вы не прошли тест');
             }
         } catch (error) {
@@ -152,6 +190,20 @@ const CourseTestPage = () => {
                         <p className="text-sm text-gray-600 mb-6">
                             Проходной балл: {test.passingScore}%
                         </p>
+                        
+                        {passed && pointsEarned > 0 && (
+                            <div className="bg-yellow-50 rounded-lg p-4 mb-4 flex items-center justify-center gap-2">
+                                <Star className="w-5 h-5 text-yellow-500" />
+                                <span className="text-yellow-700 font-medium">
+                                    Получено {pointsEarned} XP
+                                </span>
+                                {levelUp && (
+                                    <span className="text-blue-600 font-bold ml-2">
+                                        🎉 Повышение уровня!
+                                    </span>
+                                )}
+                            </div>
+                        )}
                         
                         {passed ? (
                             <div className="space-y-4">

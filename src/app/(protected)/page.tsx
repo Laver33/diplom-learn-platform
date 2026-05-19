@@ -13,7 +13,7 @@ import Link from "next/link";
 import { BookOpen, CheckCircle, User, Mail, Shield } from "lucide-react";
 
 const MainPage = () => {
-    const mainDescription = 'Рады вас снова видеть, какой замечательный день! Данная страница содержит информацию.';
+    const mainDescription = 'Рады вас видеть на нашей платформе, это главная страница на которой вы можете увидеть достаточно информации.';
     
     const [user, setUser] = useState<any>(null);
     const [completedCourses, setCompletedCourses] = useState<any[]>([]);
@@ -38,9 +38,14 @@ const MainPage = () => {
 
             const progress = userData?.courseProgress || {};
             
-            const completedCourseIds = Object.keys(progress).filter(
-                courseId => progress[courseId]?.testPassed === true
-            );
+            // Проверка ( Посмотрел уроки = прошел )
+            const completedCourseIds = Object.keys(progress).filter(courseId => {
+                const courseProgress = progress[courseId];
+
+                const hasTestPassed = courseProgress?.testPassed === true;
+                const allLessonsCompleted = courseProgress?.completedLessons?.length >= (courseProgress?.totalLessons || 0);
+                return hasTestPassed || (allLessonsCompleted && !courseProgress?.hasTest);
+            });
 
             if (completedCourseIds.length > 0) {
                 const coursesRef = collection(db, 'courses');

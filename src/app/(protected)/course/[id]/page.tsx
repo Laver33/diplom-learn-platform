@@ -16,7 +16,8 @@ const CourseDetailPage = () => {
     const [testCompleted, setTestCompleted] = useState(false);
     const [allLessonsCompleted, setAllLessonsCompleted] = useState(false);
     const [totalLessons, setTotalLessons] = useState(0);
-    const [completedLessonsCount, setCompletedLessonsCount] = useState(0); // НОВОЕ
+    const [completedLessonsCount, setCompletedLessonsCount] = useState(0);
+    const [testLoading, setTestLoading] = useState(true); // Добавил состояние загрузки теста
 
     const params = useParams()
     const id = params.id as string | undefined
@@ -69,14 +70,31 @@ const CourseDetailPage = () => {
         if (!id) return;
         
         try {
-            // Проверяем наличие теста
+            setTestLoading(true);
+            
+            // Проверяем наличие теста - ПРАВИЛЬНЫЙ ПУТЬ
             const testRef = doc(db, 'courses', id, 'tests', 'main');
             const testSnap = await getDoc(testRef);
-            setHasTest(testSnap.exists());
+            
+            console.log('🔍 Проверка теста для курса:', id);
+            console.log('📄 Тест существует:', testSnap.exists());
+            
+            if (testSnap.exists()) {
+                const testData = testSnap.data();
+                console.log('📊 Данные теста:', {
+                    questionsCount: testData.questions?.length,
+                    passingScore: testData.passingScore
+                });
+                setHasTest(true);
+            } else {
+                console.warn('⚠️ Тест не найден по пути:', `courses/${id}/tests/main`);
+                setHasTest(false);
+            }
 
             // Получаем количество уроков из курса
             if (course?.lessons) {
                 setTotalLessons(course.lessons.length);
+                console.log('📚 Количество уроков:', course.lessons.length);
             }
 
             // Проверяем прогресс пользователя
@@ -86,16 +104,27 @@ const CourseDetailPage = () => {
                 const userData = userSnap.data();
                 const progress = userData?.courseProgress?.[id];
                 
+                console.log('📈 Прогресс пользователя:', progress);
+                
                 setTestCompleted(progress?.testCompleted || false);
                 
                 // Проверяем, все ли уроки пройдены
                 const completedCount = progress?.completedLessons?.length || 0;
                 setCompletedLessonsCount(completedCount);
                 const lessonsCount = course?.lessons?.length || 0;
-                setAllLessonsCompleted(completedCount >= lessonsCount && lessonsCount > 0);
+                const allCompleted = completedCount >= lessonsCount && lessonsCount > 0;
+                setAllLessonsCompleted(allCompleted);
+                
+                console.log('✅ Все уроки пройдены:', allCompleted);
+                console.log('🎯 Тест пройден:', progress?.testCompleted || false);
+            } else {
+                console.log('👤 Пользователь не авторизован');
             }
         } catch (error) {
-            console.error('Ошибка проверки теста:', error);
+            console.error('❌ Ошибка проверки теста:', error);
+            toast.error('Ошибка проверки теста');
+        } finally {
+            setTestLoading(false);
         }
     };
 
@@ -125,7 +154,7 @@ const CourseDetailPage = () => {
         ? Math.round((completedLessonsCount / totalLessons) * 100)
         : 0;
 
-    if (isLoading) {
+    if (isLoading || testLoading) {
         return <p>Загрузка...</p>
     }
     if (error) {
@@ -182,6 +211,7 @@ const CourseDetailPage = () => {
                             Начать обучение
                         </Button>
 
+                        {/* Кнопка теста - всегда показываем, если тест существует */}
                         {hasTest && (
                             <Button 
                                 className="w-full h-14 font-semibold text-base"
@@ -191,6 +221,17 @@ const CourseDetailPage = () => {
                             >
                                 {testCompleted ? '✅ Тест пройден' : 
                                  allLessonsCompleted ? '📝 Пройти тест' : `🔒 Завершите уроки (${completedLessonsCount}/${totalLessons})`}
+                            </Button>
+                        )}
+
+                        {/* Если теста нет - показываем заглушку */}
+                        {!hasTest && !testLoading && (
+                            <Button 
+                                className="w-full h-14 font-semibold text-base"
+                                variant="outline"
+                                disabled
+                            >
+                                📝 Тест скоро появится
                             </Button>
                         )}
 
@@ -221,6 +262,11 @@ const CourseDetailPage = () => {
                             {allLessonsCompleted && !testCompleted && hasTest && (
                                 <p className="text-xs text-green-600 mt-2">
                                     🎉 Все уроки пройдены! Теперь доступен тест
+                                </p>
+                            )}
+                            {!hasTest && (
+                                <p className="text-xs text-orange-600 mt-2">
+                                    📝 Тест для этого курса еще не добавлен администратором
                                 </p>
                             )}
                         </div>

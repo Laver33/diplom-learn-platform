@@ -1,15 +1,13 @@
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
-
-
-
 const InputText = (props: { 
     value: string | number, 
     place: string, 
     titleField: string, 
     maxLength?: number, 
-    inputClassName?: string
+    inputClassName?: string,
+    type?: string,
     setFunc: (value: string) => void}) => {
         
         return(
@@ -21,7 +19,7 @@ const InputText = (props: {
                 maxLength={props.maxLength ?? undefined}
                 id="userName" 
                 placeholder={props.place}
-                type="text"
+                type={props.type || "text"}
                 value={props.value}
                 onChange={(e) => props.setFunc(e.target.value)}  
             />

@@ -16,6 +16,7 @@ const CourseLessonsPage = () => {
     const courseId = params.id as string;
     
     const [course, setCourse] = useState<any>(null);
+    const [lessons, setLessons] = useState<any[]>([]);
     const [currentLesson, setCurrentLesson] = useState(0);
     const [completedLessons, setCompletedLessons] = useState<number[]>([]);
     const [loading, setLoading] = useState(true);
@@ -30,7 +31,7 @@ const CourseLessonsPage = () => {
         try {
             setLoading(true);
             
-            // Старт
+            // Загружаем данные курса (включая массив lessons)
             const courseRef = doc(db, 'courses', courseId);
             const courseSnap = await getDoc(courseRef);
             
@@ -40,10 +41,9 @@ const CourseLessonsPage = () => {
                 return;
             }
             
-            // Обход от TS
             const courseData = { id: courseSnap.id, ...courseSnap.data() } as any;
             
-
+            // Проверяем наличие уроков в массиве
             if (!courseData.lessons || courseData.lessons.length === 0) {
                 toast.error('Уроки не найдены для этого курса');
                 router.push(`/course/${courseId}`);
@@ -51,6 +51,7 @@ const CourseLessonsPage = () => {
             }
             
             setCourse(courseData);
+            setLessons(courseData.lessons); // Берем уроки из массива
 
             // Загрузка прогресса пользователя
             const userId = auth.currentUser?.uid;
@@ -62,7 +63,12 @@ const CourseLessonsPage = () => {
                 
                 if (progress?.completedLessons) {
                     setCompletedLessons(progress.completedLessons);
-                    setCurrentLesson(progress.completedLessons.length);
+                    // Продолжаем с первого незавершенного урока
+                    if (progress.completedLessons.length < courseData.lessons.length) {
+                        setCurrentLesson(progress.completedLessons.length);
+                    } else {
+                        setCurrentLesson(courseData.lessons.length - 1);
+                    }
                 }
             }
         } catch (error) {
@@ -74,9 +80,15 @@ const CourseLessonsPage = () => {
     };
 
     const completeLesson = async () => {
-        if (!course || !course.lessons) return;
+        if (!lessons.length) return;
         
-        const newCompleted = [...completedLessons, currentLesson];
+        // Проверяем, не завершен ли уже этот урок
+        if (completedLessons.includes(currentLesson)) {
+            toast.error('Этот урок уже завершен');
+            return;
+        }
+        
+        const newCompleted = [...completedLessons, currentLesson].sort((a, b) => a - b);
         setCompletedLessons(newCompleted);
 
         // Сохраняем прогресс
@@ -88,15 +100,21 @@ const CourseLessonsPage = () => {
                     [`courseProgress.${courseId}`]: {
                         completedLessons: newCompleted,
                         lastLesson: currentLesson,
-                        updatedAt: new Date().toISOString()
+                        updatedAt: new Date().toISOString(),
+                        totalLessons: lessons.length
                     }
                 });
+                console.log('Прогресс сохранен:', newCompleted);
             } catch (error) {
                 console.error('Ошибка сохранения прогресса:', error);
+                toast.error('Ошибка сохранения прогресса');
+                // Откатываем состояние при ошибке
+                setCompletedLessons(completedLessons);
+                return;
             }
         }
 
-        if (currentLesson < course.lessons.length - 1) {
+        if (currentLesson < lessons.length - 1) {
             setCurrentLesson(currentLesson + 1);
             toast.success('Урок завершен! Переход к следующему уроку');
         } else {
@@ -131,7 +149,7 @@ const CourseLessonsPage = () => {
     }
 
     // Если нет уроков
-    if (!course.lessons || course.lessons.length === 0) {
+    if (!lessons.length) {
         return (
             <div className="flex justify-center items-center h-96">
                 <div className="text-center">
@@ -145,7 +163,7 @@ const CourseLessonsPage = () => {
     }
 
     // Безопасная проверка текущего урока
-    const currentLessonData = course.lessons[currentLesson];
+    const currentLessonData = lessons[currentLesson];
     if (!currentLessonData) {
         return (
             <div className="flex justify-center items-center h-96">
@@ -159,7 +177,10 @@ const CourseLessonsPage = () => {
         );
     }
 
-    const progress = (completedLessons.length / course.lessons.length) * 100;
+    const progress = (completedLessons.length / lessons.length) * 100;
+
+    // Проверка, можно ли перейти к следующему уроку (только если завершен текущий)
+    const canGoToNext = completedLessons.includes(currentLesson) && currentLesson < lessons.length - 1;
 
     return (
         <div className="max-w-6xl mx-auto p-6">
@@ -176,7 +197,7 @@ const CourseLessonsPage = () => {
             <div className="mb-6">
                 <h1 className="text-2xl font-bold mb-2">{course.title}</h1>
                 <div className="flex justify-between text-sm text-gray-600 mb-2">
-                    <span>Прогресс: {completedLessons.length} из {course.lessons.length} уроков</span>
+                    <span>Прогресс: {completedLessons.length} из {lessons.length} уроков</span>
                     <span>{Math.round(progress)}%</span>
                 </div>
                 <Progress value={progress} className="h-2" />
@@ -190,30 +211,43 @@ const CourseLessonsPage = () => {
                         <CardContent className="pt-6">
                             <h3 className="font-semibold mb-4">Уроки курса</h3>
                             <div className="space-y-2 max-h-125 overflow-y-auto">
-                                {course.lessons.map((lesson: any, idx: number) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => setCurrentLesson(idx)}
-                                        className={`w-full text-left p-3 rounded-lg transition-all flex items-center gap-3 ${
-                                            currentLesson === idx 
-                                                ? 'bg-blue-50 border border-blue-200' 
-                                                : 'hover:bg-gray-50'
-                                        }`}
-                                    >
-                                        {completedLessons.includes(idx) ? (
-                                            <CheckCircle className="w-5 h-5 text-green-500 shrink-0" />
-                                        ) : idx === currentLesson ? (
-                                            <PlayCircle className="w-5 h-5 text-blue-500 shrink-0" />
-                                        ) : (
-                                            <Lock className="w-5 h-5 text-gray-400 shrink-0" />
-                                        )}
-                                        <span className={`text-sm truncate ${
-                                            currentLesson === idx ? 'font-medium' : ''
-                                        }`}>
-                                            Урок {idx + 1}: {lesson.title || 'Без названия'}
-                                        </span>
-                                    </button>
-                                ))}
+                                {lessons.map((lesson: any, idx: number) => {
+                                    const isCompleted = completedLessons.includes(idx);
+                                    const isLocked = idx > completedLessons.length && idx !== currentLesson;
+                                    
+                                    return (
+                                        <button
+                                            key={idx}
+                                            onClick={() => {
+                                                // Можно перейти только к завершенным или текущему уроку
+                                                if (!isLocked || isCompleted) {
+                                                    setCurrentLesson(idx);
+                                                } else {
+                                                    toast.error('Сначала завершите предыдущие уроки');
+                                                }
+                                            }}
+                                            className={`w-full text-left p-3 rounded-lg transition-all flex items-center gap-3 ${
+                                                currentLesson === idx 
+                                                    ? 'bg-blue-50 border border-blue-200' 
+                                                    : 'hover:bg-gray-50'
+                                            } ${isLocked ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                            disabled={isLocked && !isCompleted}
+                                        >
+                                            {isCompleted ? (
+                                                <CheckCircle className="w-5 h-5 text-green-500 shrink-0" />
+                                            ) : idx === currentLesson ? (
+                                                <PlayCircle className="w-5 h-5 text-blue-500 shrink-0" />
+                                            ) : (
+                                                <Lock className="w-5 h-5 text-gray-400 shrink-0" />
+                                            )}
+                                            <span className={`text-sm truncate ${
+                                                currentLesson === idx ? 'font-medium' : ''
+                                            }`}>
+                                                Урок {idx + 1}: {lesson.title || 'Без названия'}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </CardContent>
                     </Card>
@@ -227,9 +261,9 @@ const CourseLessonsPage = () => {
                                 Урок {currentLesson + 1}: {currentLessonData.title || 'Без названия'}
                             </h2>
                             <div className="prose max-w-none mb-6 min-h-75">
-                                <p className="text-gray-700 whitespace-pre-wrap">
+                                <div className="text-gray-700 whitespace-pre-wrap font-mono text-sm bg-gray-50 p-4 rounded-lg">
                                     {currentLessonData.content || 'Контент урока пока не добавлен'}
-                                </p>
+                                </div>
                             </div>
                             
                             <div className="flex justify-between mt-6">
@@ -241,35 +275,42 @@ const CourseLessonsPage = () => {
                                     ← Предыдущий урок
                                 </Button>
                                 
-                                {!completedLessons.includes(currentLesson) && (
-                                    <Button
-                                        onClick={completeLesson}
-                                        className="bg-green-600 hover:bg-green-700"
-                                    >
-                                        ✅ Завершить урок
-                                    </Button>
-                                )}
-                                
-                                {completedLessons.includes(currentLesson) && 
-                                 currentLesson < course.lessons.length - 1 && (
-                                    <Button
-                                        onClick={() => setCurrentLesson(currentLesson + 1)}
-                                    >
-                                        Следующий урок →
-                                    </Button>
-                                )}
-                                
-                                {completedLessons.includes(currentLesson) && 
-                                currentLesson === course.lessons.length - 1 && (
-                                    <Button
-                                        onClick={() => router.push(`/course/${courseId}`)}
-                                        className="bg-blue-600 hover:bg-blue-700"
-                                    >
-                                        🎓 Завершить курс и вернуться
-                                    </Button>
-                                )}
-                                
+                                <div className="flex gap-2">
+                                    {!completedLessons.includes(currentLesson) && (
+                                        <Button
+                                            onClick={completeLesson}
+                                            className="bg-green-600 hover:bg-green-700"
+                                        >
+                                            ✅ Завершить урок
+                                        </Button>
+                                    )}
+                                    
+                                    {canGoToNext && (
+                                        <Button
+                                            onClick={() => setCurrentLesson(currentLesson + 1)}
+                                        >
+                                            Следующий урок →
+                                        </Button>
+                                    )}
+                                    
+                                    {completedLessons.includes(currentLesson) && 
+                                    currentLesson === lessons.length - 1 && (
+                                        <Button
+                                            onClick={() => router.push(`/course/${courseId}`)}
+                                            className="bg-blue-600 hover:bg-blue-700"
+                                        >
+                                            🎓 Завершить курс и вернуться
+                                        </Button>
+                                    )}
+                                </div>
                             </div>
+                            
+                            {/* Подсказка о прогрессе */}
+                            {!completedLessons.includes(currentLesson) && (
+                                <p className="text-sm text-gray-500 mt-4 text-center">
+                                    Прочитайте урок и нажмите "Завершить урок", чтобы продолжить
+                                </p>
+                            )}
                         </CardContent>
                     </Card>
                 </div>

@@ -18,10 +18,11 @@ export interface iCourse {
   introduction?: string,
   writing_guidelines?: string,
 
-  //  иконки
+  // иконки
   icon_1?: string,
   icon_2?: string,
-  
+
+  // уроки
   lessons?: Array<{
     title: string
     content: string
