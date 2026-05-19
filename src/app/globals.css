@@ -14,6 +14,11 @@ html, body {
   min-height: 100vh !important;
 }
 
+.test-mode-active .sidebar {
+    pointer-events: none;
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
 
 body {
   background: #f3f4f6;

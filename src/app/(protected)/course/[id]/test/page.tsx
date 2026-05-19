@@ -10,9 +10,9 @@ import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { toast } from "react-hot-toast";
-import { CheckCircle, XCircle, Star } from "lucide-react";
+import { CheckCircle, XCircle, Star, Shuffle } from "lucide-react";
 
-const POINTS_PER_COURSE = 20; // 20 очков за курс
+const POINTS_PER_COURSE = 20;
 
 const CourseTestPage = () => {
     const params = useParams();
@@ -20,6 +20,7 @@ const CourseTestPage = () => {
     const courseId = params.id as string;
     
     const [test, setTest] = useState<any>(null);
+    const [questions, setQuestions] = useState<any[]>([]);
     const [answers, setAnswers] = useState<number[]>([]);
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [showResults, setShowResults] = useState(false);
@@ -28,10 +29,39 @@ const CourseTestPage = () => {
     const [submitting, setSubmitting] = useState(false);
     const [pointsEarned, setPointsEarned] = useState(0);
     const [levelUp, setLevelUp] = useState(false);
+    const [isRandomOrder, setIsRandomOrder] = useState(false);
+    const [originalQuestions, setOriginalQuestions] = useState<any[]>([]);
 
     useEffect(() => {
         loadTest();
     }, [courseId]);
+
+    const shuffleArray = (array: any[]) => {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    };
+
+    const toggleRandomOrder = () => {
+        if (!isRandomOrder) {
+            // Включаем рандомный порядок
+            const shuffled = shuffleArray(originalQuestions);
+            setQuestions(shuffled);
+            setIsRandomOrder(true);
+            toast.success('Вопросы перемешаны в случайном порядке!');
+        } else {
+            // Возвращаем исходный порядок
+            setQuestions([...originalQuestions]);
+            setIsRandomOrder(false);
+            toast.success('Вопросы возвращены к исходному порядку');
+        }
+        // Сбрасываем прогресс
+        setAnswers(new Array(questions.length).fill(-1));
+        setCurrentQuestion(0);
+    };
 
     const loadTest = async () => {
         try {
@@ -41,6 +71,8 @@ const CourseTestPage = () => {
             if (testSnap.exists()) {
                 const testData = testSnap.data();
                 setTest(testData);
+                setOriginalQuestions(testData.questions);
+                setQuestions(testData.questions);
                 setAnswers(new Array(testData.questions.length).fill(-1));
             } else {
                 toast.error('Тесты не найдены для этого курса');
@@ -61,7 +93,7 @@ const CourseTestPage = () => {
     };
 
     const nextQuestion = () => {
-        if (currentQuestion < test.questions.length - 1) {
+        if (currentQuestion < questions.length - 1) {
             setCurrentQuestion(currentQuestion + 1);
         }
     };
@@ -72,7 +104,6 @@ const CourseTestPage = () => {
         }
     };
 
-    // Функция для определения уровня по очкам
     const getLevelByScore = (score: number): number => {
         if (score >= 400) return 4;
         if (score >= 300) return 3;
@@ -82,7 +113,6 @@ const CourseTestPage = () => {
     };
 
     const submitTest = async () => {
-        // Проверка что все вопросы отвечены
         if (answers.some(a => a === -1)) {
             toast.error('Ответьте на все вопросы');
             return;
@@ -90,63 +120,54 @@ const CourseTestPage = () => {
 
         setSubmitting(true);
         
-        // Подсчет баллов
+        // Подсчет баллов (с учетом оригинального порядка для сохранения)
         let correct = 0;
-        test.questions.forEach((q: any, idx: number) => {
+        questions.forEach((q: any, idx: number) => {
             if (answers[idx] === q.correctAnswer) {
                 correct++;
             }
         });
         
-        const finalScore = (correct / test.questions.length) * 100;
+        const finalScore = (correct / questions.length) * 100;
         setScore(finalScore);
         const passed = finalScore >= test.passingScore;
 
-        // Сохранение результата в Firestore
         try {
             const userId = auth.currentUser?.uid;
             if (userId) {
                 const userRef = doc(db, 'users', userId);
-                
-                // Получаем текущие очки пользователя
                 const userSnap = await getDoc(userRef);
                 const currentScore = userSnap.data()?.score || 0;
-                let newScore = currentScore;
                 let earnedPoints = 0;
                 
-                // Если тест пройден и еще не был пройден
                 const alreadyPassed = userSnap.data()?.courseProgress?.[courseId]?.testPassed;
                 
                 if (passed && !alreadyPassed) {
                     earnedPoints = POINTS_PER_COURSE;
-                    newScore = currentScore + earnedPoints;
                     setPointsEarned(earnedPoints);
                     
-                    // Проверяем повышение уровня
                     const oldLevel = getLevelByScore(currentScore);
-                    const newLevel = getLevelByScore(newScore);
+                    const newLevel = getLevelByScore(currentScore + earnedPoints);
                     if (newLevel > oldLevel) {
                         setLevelUp(true);
                         toast.success(`🎉 Поздравляем! Вы повысили уровень!`);
                     }
                 }
                 
-                // Сохраняем результат теста
                 await updateDoc(userRef, {
                     [`completedTests.${courseId}`]: {
                         score: finalScore,
                         passed: passed,
                         completedAt: new Date().toISOString(),
-                        answers: answers
+                        answers: answers,
+                        wasRandomOrder: isRandomOrder
                     },
-                    // Обновляем прогресс курса
                     [`courseProgress.${courseId}`]: {
                         testCompleted: true,
                         testScore: finalScore,
                         testPassed: passed,
                         completedAt: new Date().toISOString()
                     },
-                    // Начисляем очки если тест пройден впервые
                     ...(passed && !alreadyPassed && { score: increment(POINTS_PER_COURSE) })
                 });
 
@@ -162,6 +183,15 @@ const CourseTestPage = () => {
 
         setShowResults(true);
         setSubmitting(false);
+    };
+
+    const resetTest = () => {
+        setShowResults(false);
+        setCurrentQuestion(0);
+        setAnswers(new Array(questions.length).fill(-1));
+        if (isRandomOrder) {
+            setQuestions(shuffleArray(originalQuestions));
+        }
     };
 
     if (loading) {
@@ -219,11 +249,7 @@ const CourseTestPage = () => {
                                 <p className="text-red-600">
                                     К сожалению, вы не набрали достаточно баллов.
                                 </p>
-                                <Button onClick={() => {
-                                    setShowResults(false);
-                                    setCurrentQuestion(0);
-                                    setAnswers(new Array(test.questions.length).fill(-1));
-                                }}>
+                                <Button onClick={resetTest}>
                                     Попробовать снова
                                 </Button>
                             </div>
@@ -234,15 +260,32 @@ const CourseTestPage = () => {
         );
     }
 
-    const currentQ = test.questions[currentQuestion];
-    const progress = ((currentQuestion + 1) / test.questions.length) * 100;
+    const currentQ = questions[currentQuestion];
+    const progress = ((currentQuestion + 1) / questions.length) * 100;
 
     return (
         <div className="max-w-3xl mx-auto p-6">
             <div className="mb-6">
-                <div className="flex justify-between text-sm text-gray-600 mb-2">
-                    <span>Вопрос {currentQuestion + 1} из {test.questions.length}</span>
-                    <span>Прогресс: {Math.round(progress)}%</span>
+                <div className="flex justify-between items-center mb-2">
+                    <div className="flex gap-2 items-center">
+                        <span className="text-sm text-gray-600">
+                            Вопрос {currentQuestion + 1} из {questions.length}
+                        </span>
+                        {isRandomOrder && (
+                            <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
+                                Перемешан
+                            </span>
+                        )}
+                    </div>
+                    <Button
+                        onClick={toggleRandomOrder}
+                        variant="outline"
+                        size="sm"
+                        className="gap-2"
+                    >
+                        <Shuffle className="w-4 h-4" />
+                        {isRandomOrder ? 'Исходный порядок' : 'Перемешать вопросы'}
+                    </Button>
                 </div>
                 <Progress value={progress} className="h-2" />
             </div>
@@ -279,7 +322,7 @@ const CourseTestPage = () => {
                     ← Назад
                 </Button>
                 
-                {currentQuestion === test.questions.length - 1 ? (
+                {currentQuestion === questions.length - 1 ? (
                     <Button
                         onClick={submitTest}
                         disabled={answers[currentQuestion] === -1 || submitting}
