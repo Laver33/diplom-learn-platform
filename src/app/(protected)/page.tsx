@@ -167,9 +167,13 @@ const MainPage = () => {
                                     <span className="font-semibold">{user?.coursesArr?.length || 0}</span>
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
+
+
+                
             </div>
         </div>
     );

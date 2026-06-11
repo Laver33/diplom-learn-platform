@@ -1,18 +1,23 @@
-import Image, { StaticImageData } from "next/image";
 import { useEffect, useState } from "react";
 import { auth, db } from "@/lib/firebase/config";
 import { doc, getDoc } from "firebase/firestore";
-
-import mainIcon from '../../public/images/mainIcon.png'
 import { useCustomStore } from "@/app/store/customStore";
 
+import { 
+  CheckCircle2,      
+  BookOpen,          
+  Trophy,            
+  Sparkles,          
+  TrendingUp         
+} from 'lucide-react'
+
 interface iStatCard {
-    id: number,
-    title: string
-    icon: StaticImageData,
-    bgColor: string,
-    storeData: number | string
-    extraData?: string
+    id: number;
+    title: string;
+    IconComponent: React.ElementType; 
+    bgColor: string;
+    storeData: number | string;
+    extraData?: string;
 }
 
 const getLevelByScore = (score: number): { name: string; level: number } => {
@@ -37,6 +42,11 @@ const MainStatistic = () => {
     useEffect(() => {
         setWidthScreen(window.screen.width);
         loadUserStatistics();
+
+        // Добавляем обработчик изменения размера окна
+        const handleResize = () => setWidthScreen(window.innerWidth);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
     }, []);
 
     const loadUserStatistics = async () => {
@@ -59,16 +69,20 @@ const MainStatistic = () => {
                 setUserLevel(levelInfo.name);
 
                 const progress = userData.courseProgress || {};
+                
+                // Пройденные тесты (где testPassed === true)
                 const completedTestsCount = Object.values(progress).filter(
                     (p: any) => p?.testPassed === true
                 ).length;
                 setCompletedTests(completedTestsCount);
 
+                // Начатые курсы 
                 const startedCoursesCount = Object.keys(progress).length;
                 setStartedCourses(startedCoursesCount);
 
+                // Пройденные курсы (все тесты в курсе пройдены 
                 const completedCoursesCount = Object.values(progress).filter(
-                    (p: any) => p?.testPassed === true
+                    (p: any) => p?.courseCompleted === true || p?.testPassed === true
                 ).length;
                 setCompletedCourses(completedCoursesCount);
             }
@@ -79,45 +93,86 @@ const MainStatistic = () => {
         }
     };
 
+    // Используем React-компоненты вместо StaticImageData
     const statsCardContent: iStatCard[] = [
-        { id: 1, title: 'Пройдено тестов', icon: mainIcon, bgColor: '#b3fdfb', storeData: loading ? '...' : completedTests },
-        { id: 2, title: 'Начатых курсов', icon: mainIcon, bgColor: '#eab2ff', storeData: loading ? '...' : startedCourses },
-        { id: 3, title: 'Пройдено курсов', icon: mainIcon, bgColor: '#b5ffb4', storeData: loading ? '...' : completedCourses },
-        { id: 4, title: 'Уровень', icon: mainIcon, bgColor: '#ffeeac', storeData: loading ? '...' : userLevel, extraData: loading ? '...' : `${userScore} XP` },
+        { 
+            id: 1, 
+            title: 'Пройдено тестов', 
+            IconComponent: CheckCircle2, 
+            bgColor: '#b3fdfb', 
+            storeData: loading ? '...' : completedTests 
+        },
+        { 
+            id: 2, 
+            title: 'Начатых курсов', 
+            IconComponent: BookOpen, 
+            bgColor: '#eab2ff', 
+            storeData: loading ? '...' : startedCourses 
+        },
+        { 
+            id: 3, 
+            title: 'Пройдено курсов', 
+            IconComponent: Trophy, 
+            bgColor: '#b5ffb4', 
+            storeData: loading ? '...' : completedCourses 
+        },
+        { 
+            id: 4, 
+            title: 'Уровень', 
+            IconComponent: Sparkles, 
+            bgColor: '#ffeeac', 
+            storeData: loading ? '...' : userLevel, 
+            extraData: loading ? '...' : `${userScore} XP` 
+        },
     ];
 
+    // Адаптивная ширина
+    const cardWidth = Math.min(widthScreen / 5.4, 320); 
+
     return (
-        <div className="py-6 grid grid-cols-4 gap-6">
-            {statsCardContent.map((res) => (
+        <div className="py-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {statsCardContent.map((card) => (
                 <div 
-                    key={res.id}  
-                    style={{ width: widthScreen / 5.4, backgroundColor: cardBgColor }}
-                    className="p-4 border rounded-2xl flex justify-between hover:shadow-md hover:duration-700"
+                    key={card.id}  
+                    style={{ backgroundColor: cardBgColor }}
+                    className="p-4 border rounded-2xl flex justify-between items-center hover:shadow-md hover:shadow-slate-200 transition-all duration-300 hover:-translate-y-1"
                 >
-                    <div className="content-card">
-                        <p className="text-sm text-gray-600">{res.title}</p>
-                        <p className="text-2xl font-bold mt-1">{res.storeData}</p>
-                        {res.extraData && (
-                            <p className="text-xs text-gray-500 mt-1">{res.extraData}</p>
+                    <div className="content-card flex-1">
+                        <p className="text-sm text-gray-600">{card.title}</p>
+                        <p className="text-2xl font-bold mt-1 text-slate-800">{card.storeData}</p>
+                        {card.extraData && (
+                            <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                                <TrendingUp className="w-3 h-3" />
+                                {card.extraData}
+                            </p>
                         )}
                     </div>
 
                     <div
-                        style={{ background: res.bgColor }}
-                        className="image-card rounded-xl"
+                        style={{ background: card.bgColor }}
+                        className="image-card rounded-xl p-3 ml-3"
                     >
-                        <Image
-                            className="m-3"
-                            height={44}
-                            width={44}
-                            src={res.icon}
-                            alt={res.title}
+                        <card.IconComponent 
+                            className="w-7 h-7" 
+                            style={{ color: getIconColor(card.id) }}
+                            strokeWidth={1.75}
                         />
                     </div>
                 </div>
             ))}
         </div>
     );
+};
+
+// Функция для определения цвета иконки
+const getIconColor = (id: number): string => {
+    switch(id) {
+        case 1: return '#0d9488'; // teal-600
+        case 2: return '#7c3aed'; // violet-600  
+        case 3: return '#ea580c'; // orange-600
+        case 4: return '#d97706'; // amber-600
+        default: return '#475569';
+    }
 };
 
 export default MainStatistic;
