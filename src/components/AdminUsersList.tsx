@@ -27,11 +27,7 @@ export const AdminUsersList = () => {
 
   const deleteUser = useMutation({
     mutationFn: async (userId: string) => {
-      // Внимание: удаление пользователя из Authentication не входит в эту функцию,
-      // но можно добавить отдельно через Admin SDK (на сервере). 
-      // Здесь удаляем только документ Firestore – это безопаснее, 
-      // но учтите, что аккаунт останется в Auth. Для полноты можно 
-      // написать Cloud Function, но пока оставим так.
+
       await deleteDoc(doc(db, 'users', userId))
     },
     onSuccess: () => {

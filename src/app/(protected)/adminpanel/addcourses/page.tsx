@@ -19,6 +19,7 @@ import {
   Sparkles,
   CheckCircle2
 } from "lucide-react";
+import { ImageUpload } from "@/components/ImageUpload"; // 👈 Новый импорт
 
 // Транслитерация русского в английский
 const transliterate = (text: string): string => {
@@ -60,6 +61,7 @@ const AddCoursePage = () => {
         lessons: Array(9).fill({ title: '', content: '' })
     });
     
+    const [imageUrl, setImageUrl] = useState(''); // 👈 Новое состояние для обложки
     const [loading, setLoading] = useState(false);
     
     // Доступные иконки
@@ -125,12 +127,13 @@ const AddCoursePage = () => {
                 introduction: courseData.introduction,
                 writing_guidelines: courseData.writing_guidelines,
                 lessons: courseData.lessons.filter(l => l.title || l.content), // Убираем пустые
+                image: imageUrl, // 👈 Добавляем URL обложки
                 createdAt: new Date().toISOString(),
             });
             
             toast.success('Курс успешно добавлен!');
             
-            // Очистка формы (опционально)
+            // Очистка формы
             setCourseData({
                 courseId: '',
                 title: '',
@@ -144,6 +147,7 @@ const AddCoursePage = () => {
                 writing_guidelines: '',
                 lessons: Array(9).fill({ title: '', content: '' })
             });
+            setImageUrl(''); // 👈 Очищаем обложку
             
         } catch (error) {
             console.error('Ошибка при сохранении:', error);
@@ -153,11 +157,9 @@ const AddCoursePage = () => {
         }
     };
 
-
     // Тесты
     const [tests, setTests] = useState<any>(null);
 
-    // функция сохранения тестов:
     const saveTests = async (testData: { questions: any[], passingScore: number }) => {
         if (!courseData.courseId) {
             toast.error('Сначала сохраните курс');
@@ -320,6 +322,19 @@ const AddCoursePage = () => {
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Загрузка обложки  */}
+                    <div className="mt-8 px-5">
+                        <label className="text-sm font-medium text-gray-700 block mb-3">Обложка курса</label>
+                        <ImageUpload
+                            onUpload={(url) => setImageUrl(url)}
+                            folder="course-covers"
+                            label="Загрузить изображение (PNG, JPG, WEBP до 5 МБ)"
+                        />
+                        {imageUrl && (
+                            <p className="text-xs text-green-600 mt-2">✅ Изображение загружено</p>
+                        )}
                     </div>
 
                     {/* Детальное описание */}
